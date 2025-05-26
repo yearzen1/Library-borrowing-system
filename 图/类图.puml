@@ -1,0 +1,653 @@
+@startuml 图书借阅系统类图
+
+title 图书借阅系统类图（文件存储版 + GUI界面）
+
+!define PRIVATE -
+!define PUBLIC +
+!define PROTECTED #
+!define STATIC {static}
+
+package "实体类" {
+    class User {
+        PRIVATE String userId
+        PRIVATE String username
+        PRIVATE String password
+        PRIVATE String name
+        PRIVATE String email
+        PRIVATE String phone
+        PRIVATE Date registerDate
+        PRIVATE boolean isActive
+        
+        PUBLIC User()
+        PUBLIC User(String username, String password, String name)
+        PUBLIC String getUserId()
+        PUBLIC void setUserId(String userId)
+        PUBLIC String getUsername()
+        PUBLIC void setUsername(String username)
+        PUBLIC String getPassword()
+        PUBLIC void setPassword(String password)
+        PUBLIC String getName()
+        PUBLIC void setName(String name)
+        PUBLIC String getEmail()
+        PUBLIC void setEmail(String email)
+        PUBLIC String getPhone()
+        PUBLIC void setPhone(String phone)
+        PUBLIC Date getRegisterDate()
+        PUBLIC void setRegisterDate(Date registerDate)
+        PUBLIC boolean isActive()
+        PUBLIC void setActive(boolean active)
+        PUBLIC String toString()
+    }
+
+    class Admin {
+        PRIVATE String adminId
+        PRIVATE String username
+        PRIVATE String password
+        PRIVATE String name
+        PRIVATE String role
+        PRIVATE Date createDate
+        
+        PUBLIC Admin()
+        PUBLIC Admin(String username, String password, String name)
+        PUBLIC String getAdminId()
+        PUBLIC void setAdminId(String adminId)
+        PUBLIC String getUsername()
+        PUBLIC void setUsername(String username)
+        PUBLIC String getPassword()
+        PUBLIC void setPassword(String password)
+        PUBLIC String getName()
+        PUBLIC void setName(String name)
+        PUBLIC String getRole()
+        PUBLIC void setRole(String role)
+        PUBLIC Date getCreateDate()
+        PUBLIC void setCreateDate(Date createDate)
+        PUBLIC String toString()
+    }
+
+    class Book {
+        PRIVATE String bookId
+        PRIVATE String title
+        PRIVATE String author
+        PRIVATE String isbn
+        PRIVATE String publisher
+        PRIVATE Date publishDate
+        PRIVATE String category
+        PRIVATE int totalCopies
+        PRIVATE int availableCopies
+        PRIVATE double price
+        PRIVATE String location
+        
+        PUBLIC Book()
+        PUBLIC Book(String title, String author, String isbn)
+        PUBLIC String getBookId()
+        PUBLIC void setBookId(String bookId)
+        PUBLIC String getTitle()
+        PUBLIC void setTitle(String title)
+        PUBLIC String getAuthor()
+        PUBLIC void setAuthor(String author)
+        PUBLIC String getIsbn()
+        PUBLIC void setIsbn(String isbn)
+        PUBLIC String getPublisher()
+        PUBLIC void setPublisher(String publisher)
+        PUBLIC Date getPublishDate()
+        PUBLIC void setPublishDate(Date publishDate)
+        PUBLIC String getCategory()
+        PUBLIC void setCategory(String category)
+        PUBLIC int getTotalCopies()
+        PUBLIC void setTotalCopies(int totalCopies)
+        PUBLIC int getAvailableCopies()
+        PUBLIC void setAvailableCopies(int availableCopies)
+        PUBLIC double getPrice()
+        PUBLIC void setPrice(double price)
+        PUBLIC String getLocation()
+        PUBLIC void setLocation(String location)
+        PUBLIC boolean isAvailable()
+        PUBLIC String toString()
+    }
+
+    class BorrowRecord {
+        PRIVATE String recordId
+        PRIVATE String userId
+        PRIVATE String bookId
+        PRIVATE Date borrowDate
+        PRIVATE Date dueDate
+        PRIVATE Date returnDate
+        PRIVATE String status
+        PRIVATE double fine
+        
+        PUBLIC BorrowRecord()
+        PUBLIC BorrowRecord(String userId, String bookId)
+        PUBLIC String getRecordId()
+        PUBLIC void setRecordId(String recordId)
+        PUBLIC String getUserId()
+        PUBLIC void setUserId(String userId)
+        PUBLIC String getBookId()
+        PUBLIC void setBookId(String bookId)
+        PUBLIC Date getBorrowDate()
+        PUBLIC void setBorrowDate(Date borrowDate)
+        PUBLIC Date getDueDate()
+        PUBLIC void setDueDate(Date dueDate)
+        PUBLIC Date getReturnDate()
+        PUBLIC void setReturnDate(Date returnDate)
+        PUBLIC String getStatus()
+        PUBLIC void setStatus(String status)
+        PUBLIC double getFine()
+        PUBLIC void setFine(double fine)
+        PUBLIC boolean isOverdue()
+        PUBLIC String toString()
+    }
+}
+
+package "文件操作类" {
+    class FileManager {
+        PRIVATE STATIC final String DATA_PATH
+        PRIVATE STATIC final String USER_FILE
+        PRIVATE STATIC final String ADMIN_FILE
+        PRIVATE STATIC final String BOOK_FILE
+        PRIVATE STATIC final String BORROW_FILE
+        
+        PUBLIC STATIC List<String> readFile(String filename)
+        PUBLIC STATIC boolean writeFile(String filename, List<String> data)
+        PUBLIC STATIC boolean appendFile(String filename, String data)
+        PUBLIC STATIC boolean deleteFile(String filename)
+        PUBLIC STATIC boolean backupFiles()
+        PUBLIC STATIC boolean restoreFiles()
+        PUBLIC STATIC boolean createDataDirectory()
+        PRIVATE STATIC String getFilePath(String filename)
+    }
+
+    class UserFileDAO {
+        PRIVATE FileManager fileManager
+        PRIVATE final String USER_FILE_NAME
+        
+        PUBLIC UserFileDAO()
+        PUBLIC List<User> getAllUsers()
+        PUBLIC User getUserById(String userId)
+        PUBLIC User getUserByUsername(String username)
+        PUBLIC boolean addUser(User user)
+        PUBLIC boolean updateUser(User user)
+        PUBLIC boolean deleteUser(String userId)
+        PUBLIC boolean saveUsers(List<User> users)
+        PRIVATE User parseUser(String line)
+        PRIVATE String userToString(User user)
+    }
+
+    class AdminFileDAO {
+        PRIVATE FileManager fileManager
+        PRIVATE final String ADMIN_FILE_NAME
+        
+        PUBLIC AdminFileDAO()
+        PUBLIC List<Admin> getAllAdmins()
+        PUBLIC Admin getAdminById(String adminId)
+        PUBLIC Admin getAdminByUsername(String username)
+        PUBLIC boolean addAdmin(Admin admin)
+        PUBLIC boolean updateAdmin(Admin admin)
+        PUBLIC boolean deleteAdmin(String adminId)
+        PRIVATE Admin parseAdmin(String line)
+        PRIVATE String adminToString(Admin admin)
+    }
+
+    class BookFileDAO {
+        PRIVATE FileManager fileManager
+        PRIVATE final String BOOK_FILE_NAME
+        
+        PUBLIC BookFileDAO()
+        PUBLIC List<Book> getAllBooks()
+        PUBLIC Book getBookById(String bookId)
+        PUBLIC List<Book> getBooksByTitle(String title)
+        PUBLIC List<Book> getBooksByAuthor(String author)
+        PUBLIC List<Book> getBooksByCategory(String category)
+        PUBLIC boolean addBook(Book book)
+        PUBLIC boolean updateBook(Book book)
+        PUBLIC boolean deleteBook(String bookId)
+        PUBLIC boolean saveBooks(List<Book> books)
+        PRIVATE Book parseBook(String line)
+        PRIVATE String bookToString(Book book)
+    }
+
+    class BorrowFileDAO {
+        PRIVATE FileManager fileManager
+        PRIVATE final String BORROW_FILE_NAME
+        
+        PUBLIC BorrowFileDAO()
+        PUBLIC List<BorrowRecord> getAllBorrowRecords()
+        PUBLIC BorrowRecord getBorrowRecordById(String recordId)
+        PUBLIC List<BorrowRecord> getBorrowRecordsByUserId(String userId)
+        PUBLIC List<BorrowRecord> getBorrowRecordsByBookId(String bookId)
+        PUBLIC List<BorrowRecord> getOverdueRecords()
+        PUBLIC boolean addBorrowRecord(BorrowRecord record)
+        PUBLIC boolean updateBorrowRecord(BorrowRecord record)
+        PUBLIC boolean deleteBorrowRecord(String recordId)
+        PRIVATE BorrowRecord parseBorrowRecord(String line)
+        PRIVATE String borrowRecordToString(BorrowRecord record)
+    }
+}
+
+package "业务逻辑类" {
+    class AuthService {
+        PRIVATE UserFileDAO userDAO
+        PRIVATE AdminFileDAO adminDAO
+        
+        PUBLIC AuthService()
+        PUBLIC User userLogin(String username, String password)
+        PUBLIC Admin adminLogin(String username, String password)
+        PUBLIC boolean userRegister(User user)
+        PUBLIC boolean changePassword(String userId, String oldPassword, String newPassword)
+        PUBLIC void logout()
+        PRIVATE String encryptPassword(String password)
+        PRIVATE boolean validatePassword(String password, String encryptedPassword)
+    }
+
+    class BookService {
+        PRIVATE BookFileDAO bookDAO
+        
+        PUBLIC BookService()
+        PUBLIC List<Book> getAllBooks()
+        PUBLIC Book getBookById(String bookId)
+        PUBLIC List<Book> searchBooks(String keyword)
+        PUBLIC List<Book> getBooksByCategory(String category)
+        PUBLIC boolean addBook(Book book)
+        PUBLIC boolean updateBook(Book book)
+        PUBLIC boolean deleteBook(String bookId)
+        PUBLIC boolean importBooks(String filename)
+        PUBLIC boolean exportBooks(String filename)
+        PRIVATE String generateBookId()
+    }
+
+    class BorrowService {
+        PRIVATE BorrowFileDAO borrowDAO
+        PRIVATE BookFileDAO bookDAO
+        PRIVATE UserFileDAO userDAO
+        
+        PUBLIC BorrowService()
+        PUBLIC boolean borrowBook(String userId, String bookId)
+        PUBLIC boolean returnBook(String recordId)
+        PUBLIC boolean renewBook(String recordId)
+        PUBLIC List<BorrowRecord> getUserBorrowRecords(String userId)
+        PUBLIC List<BorrowRecord> getAllBorrowRecords()
+        PUBLIC List<BorrowRecord> getOverdueRecords()
+        PUBLIC double calculateFine(BorrowRecord record)
+        PRIVATE String generateRecordId()
+        PRIVATE Date calculateDueDate(Date borrowDate)
+    }
+
+    class UserService {
+        PRIVATE UserFileDAO userDAO
+        
+        PUBLIC UserService()
+        PUBLIC List<User> getAllUsers()
+        PUBLIC User getUserById(String userId)
+        PUBLIC boolean addUser(User user)
+        PUBLIC boolean updateUser(User user)
+        PUBLIC boolean deleteUser(String userId)
+        PUBLIC boolean activateUser(String userId)
+        PUBLIC boolean deactivateUser(String userId)
+        PRIVATE String generateUserId()
+    }
+
+    class ReportService {
+        PRIVATE BorrowFileDAO borrowDAO
+        PRIVATE BookFileDAO bookDAO
+        PRIVATE UserFileDAO userDAO
+        
+        PUBLIC ReportService()
+        PUBLIC Map<String, Integer> getBorrowStatistics()
+        PUBLIC Map<String, Integer> getBookStatistics()
+        PUBLIC Map<String, Integer> getUserStatistics()
+        PUBLIC List<Book> getPopularBooks(int limit)
+        PUBLIC List<User> getActiveUsers(int limit)
+        PUBLIC double getTotalFines()
+        PUBLIC int getOverdueCount()
+    }
+}
+
+package "GUI界面类" {
+    class LibraryMainFrame {
+        PRIVATE JFrame frame
+        PRIVATE JMenuBar menuBar
+        PRIVATE JPanel mainPanel
+        PRIVATE AuthService authService
+        PRIVATE User currentUser
+        PRIVATE Admin currentAdmin
+        
+        PUBLIC LibraryMainFrame()
+        PUBLIC void initializeFrame()
+        PUBLIC void setupMenuBar()
+        PUBLIC void showLoginDialog()
+        PUBLIC void showUserMainPanel()
+        PUBLIC void showAdminMainPanel()
+        PUBLIC void logout()
+        PUBLIC void exit()
+        PRIVATE void setupLayout()
+        PRIVATE void addEventListeners()
+    }
+
+    class LoginDialog {
+        PRIVATE JDialog dialog
+        PRIVATE JTextField usernameField
+        PRIVATE JPasswordField passwordField
+        PRIVATE JButton loginButton
+        PRIVATE JButton cancelButton
+        PRIVATE JRadioButton userRadio
+        PRIVATE JRadioButton adminRadio
+        PRIVATE AuthService authService
+        
+        PUBLIC LoginDialog(JFrame parent, AuthService authService)
+        PUBLIC void showDialog()
+        PUBLIC void hideDialog()
+        PRIVATE void handleLogin()
+        PRIVATE void setupComponents()
+        PRIVATE void setupLayout()
+        PRIVATE void addEventListeners()
+    }
+
+    class UserMainPanel {
+        PRIVATE JPanel panel
+        PRIVATE JTabbedPane tabbedPane
+        PRIVATE BookSearchPanel bookSearchPanel
+        PRIVATE UserBorrowPanel borrowPanel
+        PRIVATE UserProfilePanel profilePanel
+        PRIVATE User currentUser
+        
+        PUBLIC UserMainPanel(User user)
+        PUBLIC JPanel getPanel()
+        PUBLIC void refreshData()
+        PRIVATE void setupTabs()
+        PRIVATE void setupLayout()
+    }
+
+    class AdminMainPanel {
+        PRIVATE JPanel panel
+        PRIVATE JTabbedPane tabbedPane
+        PRIVATE BookManagementPanel bookMgmtPanel
+        PRIVATE UserManagementPanel userMgmtPanel
+        PRIVATE BorrowManagementPanel borrowMgmtPanel
+        PRIVATE ReportPanel reportPanel
+        PRIVATE Admin currentAdmin
+        
+        PUBLIC AdminMainPanel(Admin admin)
+        PUBLIC JPanel getPanel()
+        PUBLIC void refreshData()
+        PRIVATE void setupTabs()
+        PRIVATE void setupLayout()
+    }
+
+    class BookSearchPanel {
+        PRIVATE JPanel panel
+        PRIVATE JTextField searchField
+        PRIVATE JComboBox<String> categoryCombo
+        PRIVATE JButton searchButton
+        PRIVATE JTable bookTable
+        PRIVATE JScrollPane scrollPane
+        PRIVATE BookService bookService
+        
+        PUBLIC BookSearchPanel()
+        PUBLIC JPanel getPanel()
+        PUBLIC void searchBooks()
+        PUBLIC void refreshBookTable()
+        PRIVATE void setupComponents()
+        PRIVATE void setupLayout()
+        PRIVATE void addEventListeners()
+    }
+
+    class BookManagementPanel {
+        PRIVATE JPanel panel
+        PRIVATE JTable bookTable
+        PRIVATE JButton addButton
+        PRIVATE JButton editButton
+        PRIVATE JButton deleteButton
+        PRIVATE JButton importButton
+        PRIVATE JButton exportButton
+        PRIVATE BookService bookService
+        
+        PUBLIC BookManagementPanel()
+        PUBLIC JPanel getPanel()
+        PUBLIC void addBook()
+        PUBLIC void editBook()
+        PUBLIC void deleteBook()
+        PUBLIC void importBooks()
+        PUBLIC void exportBooks()
+        PUBLIC void refreshTable()
+        PRIVATE void setupComponents()
+        PRIVATE void setupLayout()
+        PRIVATE void addEventListeners()
+    }
+
+    class UserBorrowPanel {
+        PRIVATE JPanel panel
+        PRIVATE JTable borrowTable
+        PRIVATE JButton borrowButton
+        PRIVATE JButton returnButton
+        PRIVATE JButton renewButton
+        PRIVATE BorrowService borrowService
+        PRIVATE User currentUser
+        
+        PUBLIC UserBorrowPanel(User user)
+        PUBLIC JPanel getPanel()
+        PUBLIC void borrowBook()
+        PUBLIC void returnBook()
+        PUBLIC void renewBook()
+        PUBLIC void refreshTable()
+        PRIVATE void setupComponents()
+        PRIVATE void setupLayout()
+        PRIVATE void addEventListeners()
+    }
+
+    class UserManagementPanel {
+        PRIVATE JPanel panel
+        PRIVATE JTable userTable
+        PRIVATE JButton addButton
+        PRIVATE JButton editButton
+        PRIVATE JButton deleteButton
+        PRIVATE JButton activateButton
+        PRIVATE UserService userService
+        
+        PUBLIC UserManagementPanel()
+        PUBLIC JPanel getPanel()
+        PUBLIC void addUser()
+        PUBLIC void editUser()
+        PUBLIC void deleteUser()
+        PUBLIC void toggleUserStatus()
+        PUBLIC void refreshTable()
+        PRIVATE void setupComponents()
+        PRIVATE void setupLayout()
+        PRIVATE void addEventListeners()
+    }
+
+    class BorrowManagementPanel {
+        PRIVATE JPanel panel
+        PRIVATE JTable borrowTable
+        PRIVATE JButton viewDetailsButton
+        PRIVATE JButton processReturnButton
+        PRIVATE JButton viewOverdueButton
+        PRIVATE BorrowService borrowService
+        
+        PUBLIC BorrowManagementPanel()
+        PUBLIC JPanel getPanel()
+        PUBLIC void viewBorrowDetails()
+        PUBLIC void processReturn()
+        PUBLIC void viewOverdueRecords()
+        PUBLIC void refreshTable()
+        PRIVATE void setupComponents()
+        PRIVATE void setupLayout()
+        PRIVATE void addEventListeners()
+    }
+
+    class ReportPanel {
+        PRIVATE JPanel panel
+        PRIVATE JTabbedPane reportTabs
+        PRIVATE ChartPanel borrowChart
+        PRIVATE ChartPanel bookChart
+        PRIVATE JTable statisticsTable
+        PRIVATE ReportService reportService
+        
+        PUBLIC ReportPanel()
+        PUBLIC JPanel getPanel()
+        PUBLIC void generateBorrowReport()
+        PUBLIC void generateBookReport()
+        PUBLIC void generateUserReport()
+        PUBLIC void refreshCharts()
+        PRIVATE void setupComponents()
+        PRIVATE void setupLayout()
+        PRIVATE void createCharts()
+    }
+
+    class UserProfilePanel {
+        PRIVATE JPanel panel
+        PRIVATE JTextField nameField
+        PRIVATE JTextField emailField
+        PRIVATE JTextField phoneField
+        PRIVATE JButton saveButton
+        PRIVATE JButton changePasswordButton
+        PRIVATE User currentUser
+        PRIVATE UserService userService
+        
+        PUBLIC UserProfilePanel(User user)
+        PUBLIC JPanel getPanel()
+        PUBLIC void saveProfile()
+        PUBLIC void changePassword()
+        PUBLIC void refreshData()
+        PRIVATE void setupComponents()
+        PRIVATE void setupLayout()
+        PRIVATE void addEventListeners()
+    }
+}
+
+package "对话框类" {
+    class BookDialog {
+        PRIVATE JDialog dialog
+        PRIVATE JTextField titleField
+        PRIVATE JTextField authorField
+        PRIVATE JTextField isbnField
+        PRIVATE JTextField publisherField
+        PRIVATE JSpinner copiesSpinner
+        PRIVATE Book book
+        
+        PUBLIC BookDialog(JFrame parent, Book book)
+        PUBLIC void showDialog()
+        PUBLIC Book getBook()
+        PRIVATE void setupComponents()
+        PRIVATE void setupLayout()
+        PRIVATE void addEventListeners()
+    }
+
+    class UserDialog {
+        PRIVATE JDialog dialog
+        PRIVATE JTextField usernameField
+        PRIVATE JTextField nameField
+        PRIVATE JTextField emailField
+        PRIVATE JTextField phoneField
+        PRIVATE User user
+        
+        PUBLIC UserDialog(JFrame parent, User user)
+        PUBLIC void showDialog()
+        PUBLIC User getUser()
+        PRIVATE void setupComponents()
+        PRIVATE void setupLayout()
+        PRIVATE void addEventListeners()
+    }
+
+    class PasswordChangeDialog {
+        PRIVATE JDialog dialog
+        PRIVATE JPasswordField oldPasswordField
+        PRIVATE JPasswordField newPasswordField
+        PRIVATE JPasswordField confirmPasswordField
+        PRIVATE AuthService authService
+        
+        PUBLIC PasswordChangeDialog(JFrame parent, AuthService authService)
+        PUBLIC void showDialog()
+        PRIVATE void handlePasswordChange()
+        PRIVATE void setupComponents()
+        PRIVATE void setupLayout()
+        PRIVATE void addEventListeners()
+    }
+}
+
+package "工具类" {
+    class TableModel {
+        PRIVATE List<Object[]> data
+        PRIVATE String[] columnNames
+        
+        PUBLIC TableModel(String[] columnNames)
+        PUBLIC void setData(List<Object[]> data)
+        PUBLIC void addRow(Object[] row)
+        PUBLIC void removeRow(int index)
+        PUBLIC void updateRow(int index, Object[] row)
+        PUBLIC void clear()
+    }
+
+    class ChartPanel {
+        PRIVATE JPanel panel
+        PRIVATE JFreeChart chart
+        
+        PUBLIC ChartPanel()
+        PUBLIC void createBarChart(String title, Map<String, Integer> data)
+        PUBLIC void createPieChart(String title, Map<String, Integer> data)
+        PUBLIC void createLineChart(String title, Map<String, Integer> data)
+        PUBLIC JPanel getPanel()
+    }
+
+    class MessageUtils {
+        PUBLIC STATIC void showInfo(Component parent, String message)
+        PUBLIC STATIC void showWarning(Component parent, String message)
+        PUBLIC STATIC void showError(Component parent, String message)
+        PUBLIC STATIC boolean showConfirm(Component parent, String message)
+        PUBLIC STATIC String showInput(Component parent, String message)
+    }
+}
+
+' 关系定义
+User ||--o{ BorrowRecord : "借阅"
+Book ||--o{ BorrowRecord : "被借阅"
+
+UserFileDAO --> User : "管理"
+AdminFileDAO --> Admin : "管理"
+BookFileDAO --> Book : "管理"
+BorrowFileDAO --> BorrowRecord : "管理"
+
+UserFileDAO --> FileManager : "使用"
+AdminFileDAO --> FileManager : "使用"
+BookFileDAO --> FileManager : "使用"
+BorrowFileDAO --> FileManager : "使用"
+
+AuthService --> UserFileDAO : "使用"
+AuthService --> AdminFileDAO : "使用"
+BookService --> BookFileDAO : "使用"
+BorrowService --> BorrowFileDAO : "使用"
+BorrowService --> BookFileDAO : "使用"
+BorrowService --> UserFileDAO : "使用"
+UserService --> UserFileDAO : "使用"
+ReportService --> BorrowFileDAO : "使用"
+ReportService --> BookFileDAO : "使用"
+ReportService --> UserFileDAO : "使用"
+
+LibraryMainFrame --> AuthService : "使用"
+LibraryMainFrame --> LoginDialog : "创建"
+LibraryMainFrame --> UserMainPanel : "创建"
+LibraryMainFrame --> AdminMainPanel : "创建"
+
+LoginDialog --> AuthService : "使用"
+UserMainPanel --> BookSearchPanel : "包含"
+UserMainPanel --> UserBorrowPanel : "包含"
+UserMainPanel --> UserProfilePanel : "包含"
+
+AdminMainPanel --> BookManagementPanel : "包含"
+AdminMainPanel --> UserManagementPanel : "包含"
+AdminMainPanel --> BorrowManagementPanel : "包含"
+AdminMainPanel --> ReportPanel : "包含"
+
+BookSearchPanel --> BookService : "使用"
+BookManagementPanel --> BookService : "使用"
+BookManagementPanel --> BookDialog : "创建"
+UserBorrowPanel --> BorrowService : "使用"
+UserManagementPanel --> UserService : "使用"
+UserManagementPanel --> UserDialog : "创建"
+BorrowManagementPanel --> BorrowService : "使用"
+ReportPanel --> ReportService : "使用"
+ReportPanel --> ChartPanel : "使用"
+UserProfilePanel --> UserService : "使用"
+UserProfilePanel --> PasswordChangeDialog : "创建"
+
+PasswordChangeDialog --> AuthService : "使用"
+
+@enduml
