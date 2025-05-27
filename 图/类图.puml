@@ -9,74 +9,42 @@ title 图书借阅系统类图（文件存储版 + GUI界面）
 
 package "实体类" {
     class User {
+        PRIVATE String id
         PRIVATE String userId
         PRIVATE String username
         PRIVATE String password
-        PRIVATE String name
-        PRIVATE String email
-        PRIVATE String phone
-        PRIVATE Date registerDate
-        PRIVATE boolean isActive
         
         PUBLIC User()
-        PUBLIC User(String username, String password, String name)
+        PUBLIC User(String username, String password, String userid)
         PUBLIC String getUserId()
         PUBLIC void setUserId(String userId)
         PUBLIC String getUsername()
         PUBLIC void setUsername(String username)
         PUBLIC String getPassword()
         PUBLIC void setPassword(String password)
-        PUBLIC String getName()
-        PUBLIC void setName(String name)
-        PUBLIC String getEmail()
-        PUBLIC void setEmail(String email)
-        PUBLIC String getPhone()
-        PUBLIC void setPhone(String phone)
-        PUBLIC Date getRegisterDate()
-        PUBLIC void setRegisterDate(Date registerDate)
-        PUBLIC boolean isActive()
-        PUBLIC void setActive(boolean active)
-        PUBLIC String toString()
     }
 
     class Admin {
         PRIVATE String adminId
-        PRIVATE String username
+        PRIVATE String adminname
         PRIVATE String password
-        PRIVATE String name
-        PRIVATE String role
-        PRIVATE Date createDate
         
         PUBLIC Admin()
-        PUBLIC Admin(String username, String password, String name)
+        PUBLIC Admin(String adminname, String password, String adminId)
         PUBLIC String getAdminId()
         PUBLIC void setAdminId(String adminId)
-        PUBLIC String getUsername()
-        PUBLIC void setUsername(String username)
+        PUBLIC String getAdminrname()
+        PUBLIC void setAdminname(String username)
         PUBLIC String getPassword()
         PUBLIC void setPassword(String password)
-        PUBLIC String getName()
-        PUBLIC void setName(String name)
-        PUBLIC String getRole()
-        PUBLIC void setRole(String role)
-        PUBLIC Date getCreateDate()
-        PUBLIC void setCreateDate(Date createDate)
-        PUBLIC String toString()
     }
 
     class Book {
-        PRIVATE String bookId
+        PRIVATE String id
         PRIVATE String title
         PRIVATE String author
         PRIVATE String isbn
-        PRIVATE String publisher
-        PRIVATE Date publishDate
-        PRIVATE String category
-        PRIVATE int totalCopies
-        PRIVATE int availableCopies
-        PRIVATE double price
-        PRIVATE String location
-        
+        PRIVATE boolean isborrow
         PUBLIC Book()
         PUBLIC Book(String title, String author, String isbn)
         PUBLIC String getBookId()
@@ -87,22 +55,8 @@ package "实体类" {
         PUBLIC void setAuthor(String author)
         PUBLIC String getIsbn()
         PUBLIC void setIsbn(String isbn)
-        PUBLIC String getPublisher()
-        PUBLIC void setPublisher(String publisher)
-        PUBLIC Date getPublishDate()
-        PUBLIC void setPublishDate(Date publishDate)
-        PUBLIC String getCategory()
-        PUBLIC void setCategory(String category)
-        PUBLIC int getTotalCopies()
-        PUBLIC void setTotalCopies(int totalCopies)
-        PUBLIC int getAvailableCopies()
-        PUBLIC void setAvailableCopies(int availableCopies)
-        PUBLIC double getPrice()
-        PUBLIC void setPrice(double price)
-        PUBLIC String getLocation()
-        PUBLIC void setLocation(String location)
-        PUBLIC boolean isAvailable()
-        PUBLIC String toString()
+        PUBLIC boolean setIsBorrow()
+        PUBLIC boolean getIsBorrow()
     }
 
     class BorrowRecord {
@@ -113,7 +67,7 @@ package "实体类" {
         PRIVATE Date dueDate
         PRIVATE Date returnDate
         PRIVATE String status
-        PRIVATE double fine
+        PRIVATE boolean isoverdue
         
         PUBLIC BorrowRecord()
         PUBLIC BorrowRecord(String userId, String bookId)
@@ -131,10 +85,8 @@ package "实体类" {
         PUBLIC void setReturnDate(Date returnDate)
         PUBLIC String getStatus()
         PUBLIC void setStatus(String status)
-        PUBLIC double getFine()
-        PUBLIC void setFine(double fine)
-        PUBLIC boolean isOverdue()
-        PUBLIC String toString()
+        PUBLIC boolean getisOverdue()
+        PUBLIC void setisOverdue() 
     }
 }
 
