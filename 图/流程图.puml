@@ -4,13 +4,35 @@ title 图书借阅系统流程图（文件存储版）
 
 actor 读者 as Reader
 actor 管理员 as Admin
-participant "登录系统" as Login
-participant "图书管理" as BookMgmt
-participant "借阅管理" as BorrowMgmt
-participant "还书管理" as ReturnMgmt
-participant "用户管理" as UserMgmt
-participant "文件系统" as FileSystem
+participant "3注册系统" as register
+participant "2登录系统" as Login
+participant "2图书查询" as BookMgmt
+participant "3借书管理" as BorrowMgmt
+participant "3还书管理" as ReturnMgmt
+participant "2用户管理" as UserMgmt
+participant "1文件系统" as FileSystem
 
+== 用户注册 ==
+loop 直到注册成功
+    Reader -> register: 输入用户名账号密码
+    register -> FileSystem: 检查用户名和账号唯一性
+    FileSystem -> register: 返回验证结果
+    
+    alt 验证通过
+        register -> FileSystem: 保存用户信息
+        FileSystem -> register: 保存成功
+        register -> Reader: 注册成功
+        break 注册完成
+            Reader -> Login: 进入登录系统
+        end
+    else 用户名已存在
+        register -> Reader: 用户名已存在，请重新输入
+    else 账号已存在
+        register -> Reader: 账号已存在，请重新输入
+    else 密码不符合要求
+        register -> Reader: 密码格式错误，请重新输入
+    end
+end
 == 用户登录 ==
 Reader -> Login: 输入用户名密码
 Login -> FileSystem: 读取用户信息文件
