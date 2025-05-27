@@ -5,6 +5,7 @@ title 图书借阅系统流程图（文件存储版）
 actor 读者 as Reader
 actor 管理员 as Admin
 participant "3注册系统" as register
+participant "2修改密码" as changepwd
 participant "2登录系统" as Login
 participant "2图书查询" as BookMgmt
 participant "3借书管理" as BorrowMgmt
@@ -42,6 +43,24 @@ alt 登录成功
 else 登录失败
     Login -> Reader: 显示错误信息
     Reader -> Login: 重新输入
+end
+
+== 修改密码 ==
+Reader -> changepwd:输入用户id
+Reader -> FileSystem:访问用户文件
+FileSystem -> Reader:返回用户id存不存在
+alt 用户不存在
+    Reader -> register:注册用户
+else 用户存在
+    Reader -> register:输入旧密码
+    Reader -> FileSystem:访问用户文件
+    FileSystem -> Reader:返回密码符不符合
+    alt 密码符合
+    Reader -> register:修改密码
+    Reader -> Login:登录
+    else 密码不符合
+    Reader ->register:密码不符合请重试
+    end
 end
 
 == 图书查询与借阅 ==
