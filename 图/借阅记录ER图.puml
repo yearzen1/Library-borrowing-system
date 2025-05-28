@@ -1,0 +1,49 @@
+@startuml 借阅记录ER图
+
+!define PRIMARY_KEY(x) <u>x</u>
+!define FOREIGN_KEY(x) <i>x</i>
+
+entity "借阅记录表 (borrows)" as borrows {
+  PRIMARY_KEY(borrow_id) : INT
+  --
+  FOREIGN_KEY(user_id) : INT
+  FOREIGN_KEY(book_id) : INT
+  borrow_date : DATETIME
+  due_date : DATE
+  return_date : DATETIME
+  fine_amount : DECIMAL(10,2)
+  status : TINYINT
+  renew_count : INT
+  remarks : VARCHAR(255)
+}
+
+entity "用户信息表 (users)" as users {
+  PRIMARY_KEY(user_id) : INT
+  username : VARCHAR(50)
+  ...
+}
+
+entity "图书信息表 (books)" as books {
+  PRIMARY_KEY(book_id) : INT
+  title : VARCHAR(200)
+  ...
+}
+
+borrows }|--|| users : 借阅者
+borrows }|--|| books : 借阅图书
+
+note right of borrows
+  字段说明:
+  - borrow_id: 借阅记录唯一标识
+  - user_id: 借阅用户ID(外键)
+  - book_id: 借阅图书ID(外键)
+  - borrow_date: 借阅时间
+  - due_date: 应还日期
+  - return_date: 实际归还时间
+  - fine_amount: 罚金金额
+  - status: 借阅状态(1:借出 2:已还 3:逾期)
+  - renew_count: 续借次数
+  - remarks: 备注信息
+end note
+
+@enduml

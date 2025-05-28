@@ -1,0 +1,43 @@
+@startuml 图书信息ER图
+
+!define PRIMARY_KEY(x) <u>x</u>
+
+entity "图书信息表 (books)" as books {
+  PRIMARY_KEY(book_id) : INT
+  --
+  isbn : VARCHAR(20)
+  title : VARCHAR(200)
+  author : VARCHAR(100)
+  publisher : VARCHAR(100)
+  publish_date : DATE
+  category : VARCHAR(50)
+  price : DECIMAL(10,2)
+  total_copies : INT
+  available_copies : INT
+  location : VARCHAR(100)
+  description : TEXT
+  cover_image : VARCHAR(255)
+  add_date : DATETIME
+  status : TINYINT
+}
+
+note right of books
+  字段说明:
+  - book_id: 图书唯一标识
+  - isbn: 国际标准书号
+  - title: 书名
+  - author: 作者
+  - publisher: 出版社
+  - publish_date: 出版日期
+  - category: 图书分类
+  - price: 价格
+  - total_copies: 总册数
+  - available_copies: 可借册数
+  - location: 图书位置
+  - description: 图书描述
+  - cover_image: 封面图片路径
+  - add_date: 入库时间
+  - status: 图书状态(1:正常 0:下架)
+end note
+
+@enduml

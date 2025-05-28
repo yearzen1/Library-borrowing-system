@@ -1,0 +1,39 @@
+@startuml 用户信息ER图
+
+!define TABLE(name,desc) class name as "desc" << (T,#FFAAAA) >>
+!define PRIMARY_KEY(x) <u>x</u>
+!define FOREIGN_KEY(x) <i>x</i>
+
+entity "用户信息表 (users)" as users {
+  PRIMARY_KEY(user_id) : INT
+  --
+  username : VARCHAR(50)
+  account : VARCHAR(20)
+  password : VARCHAR(100)
+  email : VARCHAR(100)
+  phone : VARCHAR(20)
+  real_name : VARCHAR(50)
+  student_id : VARCHAR(20)
+  register_date : DATETIME
+  status : TINYINT
+  max_borrow_books : INT
+  current_borrow_count : INT
+}
+
+note right of users
+  字段说明:
+  - user_id: 用户唯一标识
+  - username: 用户名(唯一)
+  - account: 账号(唯一)
+  - password: 加密密码
+  - email: 邮箱地址
+  - phone: 手机号码
+  - real_name: 真实姓名
+  - student_id: 学号
+  - register_date: 注册时间
+  - status: 用户状态(1:正常 0:禁用)
+  - max_borrow_books: 最大借书数量
+  - current_borrow_count: 当前借书数量
+end note
+
+@enduml

@@ -1,0 +1,48 @@
+@startuml 管理员信息ER图
+
+!define PRIMARY_KEY(x) <u>x</u>
+
+entity "管理员信息表 (admins)" as admins {
+  PRIMARY_KEY(admin_id) : INT
+  --
+  admin_name : VARCHAR(50)
+  admin_account : VARCHAR(20)
+  admin_password : VARCHAR(100)
+  real_name : VARCHAR(50)
+  email : VARCHAR(100)
+  phone : VARCHAR(20)
+  role_level : TINYINT
+  permissions : VARCHAR(500)
+  create_date : DATETIME
+  last_login : DATETIME
+  status : TINYINT
+  creator_id : INT
+}
+
+note right of admins
+  字段说明:
+  - admin_id: 管理员唯一标识
+  - admin_name: 管理员用户名(唯一)
+  - admin_account: 管理员账号(唯一)
+  - admin_password: 加密密码
+  - real_name: 真实姓名
+  - email: 邮箱地址
+  - phone: 手机号码
+  - role_level: 角色级别(1:超级管理员 2:普通管理员)
+  - permissions: 权限列表(JSON格式)
+  - create_date: 创建时间
+  - last_login: 最后登录时间
+  - status: 状态(1:正常 0:禁用)
+  - creator_id: 创建者ID
+end note
+
+note left of admins
+  权限说明:
+  - 用户管理权限
+  - 图书管理权限
+  - 借阅管理权限
+  - 系统设置权限
+  - 数据统计权限
+end note
+
+@enduml

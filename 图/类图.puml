@@ -1,4 +1,4 @@
-@startuml title 图书借阅系统类图（文件存储版 + GUI界面）
+@startuml title 图书借阅系统类图（数据库存储版 + GUI界面）
 
 !define PRIVATE -
 !define PUBLIC +

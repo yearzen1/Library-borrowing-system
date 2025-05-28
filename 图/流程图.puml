@@ -1,6 +1,6 @@
 @startuml 图书借阅系统流程图
 
-title 图书借阅系统流程图（文件存储版）
+title 图书借阅系统流程图（数据库存储版）
 
 actor 读者 as Reader
 actor 管理员 as Admin
@@ -11,7 +11,7 @@ participant "2图书查询" as BookMgmt
 participant "3借书管理" as BorrowMgmt
 participant "3还书管理" as ReturnMgmt
 participant "2用户管理" as UserMgmt
-participant "1文件系统" as FileSystem
+participant "1数据库系统" as FileSystem
 
 == 用户注册 ==
 loop 直到注册成功
@@ -36,7 +36,7 @@ loop 直到注册成功
 end
 == 用户登录 ==
 Reader -> Login: 输入用户名密码
-Login -> FileSystem: 读取用户信息文件
+Login -> FileSystem: 读取用户信息数据库
 FileSystem -> Login: 返回用户数据
 alt 登录成功
     Login -> Reader: 登录成功，进入主界面
@@ -47,13 +47,13 @@ end
 
 == 修改密码 ==
 Reader -> changepwd:输入用户id
-Reader -> FileSystem:访问用户文件
+Reader -> FileSystem:访问用户数据库
 FileSystem -> Reader:返回用户id存不存在
 alt 用户不存在
     Reader -> register:注册用户
 else 用户存在
     Reader -> register:输入旧密码
-    Reader -> FileSystem:访问用户文件
+    Reader -> FileSystem:访问用户数据库
     FileSystem -> Reader:返回密码符不符合
     alt 密码符合
     Reader -> register:修改密码
@@ -65,18 +65,18 @@ end
 
 == 图书查询与借阅 ==
 Reader -> BookMgmt: 查询图书
-BookMgmt -> FileSystem: 读取图书信息文件
+BookMgmt -> FileSystem: 读取图书信息数据库
 FileSystem -> BookMgmt: 返回图书列表
 BookMgmt -> Reader: 显示图书信息
 
 Reader -> BorrowMgmt: 申请借阅图书
-BorrowMgmt -> FileSystem: 读取图书库存文件
+BorrowMgmt -> FileSystem: 读取图书库存数据库
 FileSystem -> BorrowMgmt: 返回库存信息
 
 alt 图书可借
-    BorrowMgmt -> FileSystem: 更新借阅记录文件
-    BorrowMgmt -> FileSystem: 更新图书状态文件
-    FileSystem -> BorrowMgmt: 文件更新成功
+    BorrowMgmt -> FileSystem: 更新借阅记录数据库
+    BorrowMgmt -> FileSystem: 更新图书状态数据库
+    FileSystem -> BorrowMgmt: 数据库更新成功
     BorrowMgmt -> Reader: 借阅成功通知
 else 图书不可借
     BorrowMgmt -> Reader: 图书已借完或不存在
@@ -84,13 +84,13 @@ end
 
 == 图书归还 ==
 Reader -> ReturnMgmt: 归还图书
-ReturnMgmt -> FileSystem: 读取借阅记录文件
+ReturnMgmt -> FileSystem: 读取借阅记录数据库
 FileSystem -> ReturnMgmt: 返回借阅信息
 
 alt 借阅记录存在
-    ReturnMgmt -> FileSystem: 更新借阅记录文件
-    ReturnMgmt -> FileSystem: 更新图书可借状态文件
-    FileSystem -> ReturnMgmt: 文件更新成功
+    ReturnMgmt -> FileSystem: 更新借阅记录数据库
+    ReturnMgmt -> FileSystem: 更新图书可借状态数据库
+    FileSystem -> ReturnMgmt: 数据库更新成功
     ReturnMgmt -> Reader: 归还成功通知
 else 借阅记录不存在
     ReturnMgmt -> Reader: 无借阅记录或已归还
@@ -98,31 +98,31 @@ end
 
 == 管理员功能 ==
 Admin -> Login: 管理员登录
-Login -> FileSystem: 读取管理员权限文件
+Login -> FileSystem: 读取管理员权限数据库
 FileSystem -> Login: 返回权限信息
 Login -> Admin: 进入管理界面
 
 Admin -> BookMgmt: 图书管理操作
-BookMgmt -> FileSystem: 读写图书信息文件
+BookMgmt -> FileSystem: 读写图书信息数据库
 FileSystem -> BookMgmt: 返回操作结果
 BookMgmt -> Admin: 显示操作结果
 
 Admin -> UserMgmt: 用户管理操作
-UserMgmt -> FileSystem: 读写用户信息文件
+UserMgmt -> FileSystem: 读写用户信息数据库
 FileSystem -> UserMgmt: 返回操作结果
 UserMgmt -> Admin: 显示操作结果
 
 Admin -> BorrowMgmt: 查看借阅统计
-BorrowMgmt -> FileSystem: 读取借阅记录文件
+BorrowMgmt -> FileSystem: 读取借阅记录数据库
 FileSystem -> BorrowMgmt: 返回统计数据
 BorrowMgmt -> Admin: 显示借阅报表
 
 note right of FileSystem
-  数据存储文件:
-  - users.txt (用户信息)
-  - books.txt (图书信息)
-  - borrows.txt (借阅记录)
-  - admins.txt (管理员信息)
+  数据存储数据库:
+  - users  (用户信息)
+  - books  (图书信息)
+  - borrows  (借阅记录)
+  - admins  (管理员信息)
 end note
 
 @enduml
