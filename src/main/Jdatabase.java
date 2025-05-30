@@ -45,7 +45,7 @@ public class Jdatabase {
     private static String insertBook = "INSERT INTO library_borrow_system.Book (id, isbn, title, author, isBorrow) VALUES (?, ?, ?, ?, ?)";
     private static String insertBorrow = "INSERT INTO library_borrow_system.Borrow (borrowid, userid, bookid, borrowdate, duedate, returndate, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-    public void insertUser(int userId, String userName, String userPwd) throws Exception 
+    public static void insertUser(int userId, String userName, String userPwd) throws Exception 
     {
         preparedStatement = connection.prepareStatement(insertUser);
         preparedStatement.setInt(1, userId);
@@ -53,7 +53,7 @@ public class Jdatabase {
         preparedStatement.setString(3, userPwd);
         preparedStatement.executeUpdate();
     }
-    public void insertAdmin(int adminId, String adminName, String adminPwd) throws Exception 
+    public static void insertAdmin(int adminId, String adminName, String adminPwd) throws Exception 
     {
         preparedStatement = connection.prepareStatement(insertAdmin);
         preparedStatement.setInt(1, adminId);
@@ -61,7 +61,7 @@ public class Jdatabase {
         preparedStatement.setString(3, adminPwd);
         preparedStatement.executeUpdate();
     }
-    public void insertBook(int bookId, String isbn, String title, String author, boolean isBorrow) throws Exception 
+    public static void insertBook(int bookId, String isbn, String title, String author, boolean isBorrow) throws Exception 
     {
         preparedStatement = connection.prepareStatement(insertBook);
         preparedStatement.setInt(1, bookId);
@@ -71,7 +71,7 @@ public class Jdatabase {
         preparedStatement.setBoolean(5, isBorrow);
         preparedStatement.executeUpdate();
     }
-    public void insertBorrow(int borrowId, int userId, int bookId, 
+    public static void insertBorrow(int borrowId, int userId, int bookId, 
                             java.sql.Date borrowDate, java.sql.Date dueDate, 
                             java.sql.Date returnDate, String status) throws Exception 
     {
@@ -91,7 +91,7 @@ public class Jdatabase {
     private static String updateBook = "UPDATE library_borrow_system.Book SET isbn = ?, title = ?, author = ?, isBorrow = ? WHERE id = ?";
     private static String updateBorrow = "UPDATE library_borrow_system.Borrow SET userid = ?, bookid = ?, borrowdate = ?, duedate = ?, returndate = ?, status = ? WHERE borrowid = ?";
 
-    public void updateUser(int userId, String userName, String userPwd) throws Exception {
+    public static void updateUser(int userId, String userName, String userPwd) throws Exception {
         preparedStatement = connection.prepareStatement(updateUser);
         preparedStatement.setString(1, userName);
         preparedStatement.setString(2, userPwd);
@@ -99,7 +99,7 @@ public class Jdatabase {
         preparedStatement.executeUpdate();
     }
 
-    public void updateAdmin(int adminId, String adminName, String adminPwd) throws Exception {
+    public static void updateAdmin(int adminId, String adminName, String adminPwd) throws Exception {
         preparedStatement = connection.prepareStatement(updateAdmin);
         preparedStatement.setString(1, adminName);
         preparedStatement.setString(2, adminPwd);
@@ -107,7 +107,7 @@ public class Jdatabase {
         preparedStatement.executeUpdate();
     }
 
-    public void updateBook(int bookId, String isbn, String title, String author, boolean isBorrow) throws Exception {
+    public static void updateBook(int bookId, String isbn, String title, String author, boolean isBorrow) throws Exception {
         preparedStatement = connection.prepareStatement(updateBook);
         preparedStatement.setString(1, isbn);
         preparedStatement.setString(2, title);
@@ -117,7 +117,7 @@ public class Jdatabase {
         preparedStatement.executeUpdate();
     }
 
-    public void updateBorrow(int borrowId, int userId, int bookId, 
+    public static void updateBorrow(int borrowId, int userId, int bookId, 
                             java.sql.Date borrowDate, java.sql.Date dueDate, 
                             java.sql.Date returnDate, String status) throws Exception {
         preparedStatement = connection.prepareStatement(updateBorrow);
@@ -131,7 +131,7 @@ public class Jdatabase {
         preparedStatement.executeUpdate();
     }
 
-    public void updateBookStatus(int bookId, boolean isBorrow) throws Exception {
+    public static void updateBookStatus(int bookId, boolean isBorrow) throws Exception {
         String updateBookStatus = "UPDATE library_borrow_system.Book SET isBorrow = ? WHERE id = ?";
         preparedStatement = connection.prepareStatement(updateBookStatus);
         preparedStatement.setBoolean(1, isBorrow);
@@ -139,10 +139,18 @@ public class Jdatabase {
         preparedStatement.executeUpdate();
     }
 
-    public void updateBorrowStatus(int borrowId, String status) throws Exception {
+    public static void updateBorrowStatus(int borrowId, String status) throws Exception {
         String updateBorrowStatus = "UPDATE library_borrow_system.Borrow SET status = ? WHERE borrowid = ?";
         preparedStatement = connection.prepareStatement(updateBorrowStatus);
         preparedStatement.setString(1, status);
+        preparedStatement.setInt(2, borrowId);
+        preparedStatement.executeUpdate();
+    }
+
+    public static void updateBorrowReturnDate(int borrowId, java.sql.Date returnDate) throws Exception {
+        String sql = "UPDATE library_borrow_system.Borrow SET returndate = ? WHERE borrowid = ?";
+        preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setDate(1, returnDate);
         preparedStatement.setInt(2, borrowId);
         preparedStatement.executeUpdate();
     }
@@ -152,25 +160,25 @@ public class Jdatabase {
     private static String deleteBook = "DELETE FROM library_borrow_system.Book WHERE id = ?";
     private static String deleteBorrow = "DELETE FROM library_borrow_system.Borrow WHERE borrowid = ?";
 
-    public void deleteUser(int userId) throws Exception {
+    public static void deleteUser(int userId) throws Exception {
         preparedStatement = connection.prepareStatement(deleteUser);
         preparedStatement.setInt(1, userId);
         preparedStatement.executeUpdate();
     }
 
-    public void deleteAdmin(int adminId) throws Exception {
+    public static void deleteAdmin(int adminId) throws Exception {
         preparedStatement = connection.prepareStatement(deleteAdmin);
         preparedStatement.setInt(1, adminId);
         preparedStatement.executeUpdate();
     }
 
-    public void deleteBook(int bookId) throws Exception {
+    public static void deleteBook(int bookId) throws Exception {
         preparedStatement = connection.prepareStatement(deleteBook);
         preparedStatement.setInt(1, bookId);
         preparedStatement.executeUpdate();
     }
 
-    public void deleteBorrow(int borrowId) throws Exception {
+    public static void deleteBorrow(int borrowId) throws Exception {
         preparedStatement = connection.prepareStatement(deleteBorrow);
         preparedStatement.setInt(1, borrowId);
         preparedStatement.executeUpdate();
@@ -187,59 +195,59 @@ public class Jdatabase {
     private static String selectBorrowById = "SELECT * FROM library_borrow_system.Borrow WHERE borrowid = ?";
 
     // 查询所有用户
-    public ResultSet selectAllUsers() throws Exception {
+    public static ResultSet selectAllUsers() throws Exception {
         preparedStatement = connection.prepareStatement(selectAllUsers);
         return preparedStatement.executeQuery();
     }
 
     // 根据ID查询用户
-    public ResultSet selectUserById(int userId) throws Exception {
+    public static ResultSet selectUserById(int userId) throws Exception {
         preparedStatement = connection.prepareStatement(selectUserById);
         preparedStatement.setInt(1, userId);
         return preparedStatement.executeQuery();
     }
 
     // 查询所有管理员
-    public ResultSet selectAllAdmins() throws Exception {
+    public static ResultSet selectAllAdmins() throws Exception {
         preparedStatement = connection.prepareStatement(selectAllAdmins);
         return preparedStatement.executeQuery();
     }
 
     // 根据ID查询管理员
-    public ResultSet selectAdminById(int adminId) throws Exception {
+    public static ResultSet selectAdminById(int adminId) throws Exception {
         preparedStatement = connection.prepareStatement(selectAdminById);
         preparedStatement.setInt(1, adminId);
         return preparedStatement.executeQuery();
     }
 
     // 查询所有图书
-    public ResultSet selectAllBooks() throws Exception {
+    public static ResultSet selectAllBooks() throws Exception {
         preparedStatement = connection.prepareStatement(selectAllBooks);
         return preparedStatement.executeQuery();
     }
 
     // 根据ID查询图书
-    public ResultSet selectBookById(int bookId) throws Exception {
+    public static ResultSet selectBookById(int bookId) throws Exception {
         preparedStatement = connection.prepareStatement(selectBookById);
         preparedStatement.setInt(1, bookId);
         return preparedStatement.executeQuery();
     }
 
     // 查询所有借阅记录
-    public ResultSet selectAllBorrows() throws Exception {
+    public static ResultSet selectAllBorrows() throws Exception {
         preparedStatement = connection.prepareStatement(selectAllBorrows);
         return preparedStatement.executeQuery();
     }
 
     // 根据ID查询借阅记录
-    public ResultSet selectBorrowById(int borrowId) throws Exception {
+    public static ResultSet selectBorrowById(int borrowId) throws Exception {
         preparedStatement = connection.prepareStatement(selectBorrowById);
         preparedStatement.setInt(1, borrowId);
         return preparedStatement.executeQuery();
     }
 
     // 根据用户ID查询借阅记录
-    public ResultSet selectBorrowsByUser(int userId) throws Exception {
+    public static ResultSet selectBorrowsByUser(int userId) throws Exception {
         String selectBorrowsByUser = "SELECT * FROM library_borrow_system.Borrow WHERE userid = ?";
         preparedStatement = connection.prepareStatement(selectBorrowsByUser);
         preparedStatement.setInt(1, userId);
@@ -247,7 +255,7 @@ public class Jdatabase {
     }
 
     // 根据图书ID查询借阅记录
-    public ResultSet selectBorrowsByBook(int bookId) throws Exception {
+    public static ResultSet selectBorrowsByBook(int bookId) throws Exception {
         String selectBorrowsByBook = "SELECT * FROM library_borrow_system.Borrow WHERE bookid = ?";
         preparedStatement = connection.prepareStatement(selectBorrowsByBook);
         preparedStatement.setInt(1, bookId);
@@ -255,14 +263,14 @@ public class Jdatabase {
     }
 
     // 查询可借图书
-    public ResultSet selectAvailableBooks() throws Exception {
+    public static ResultSet selectAvailableBooks() throws Exception {
         String selectAvailableBooks = "SELECT * FROM library_borrow_system.Book WHERE isBorrow = 0";
         preparedStatement = connection.prepareStatement(selectAvailableBooks);
         return preparedStatement.executeQuery();
     }
 
     // 根据书名模糊查询图书
-    public ResultSet selectBooksByTitle(String title) throws Exception {
+    public static ResultSet selectBooksByTitle(String title) throws Exception {
         String selectBooksByTitle = "SELECT * FROM library_borrow_system.Book WHERE title LIKE ?";
         preparedStatement = connection.prepareStatement(selectBooksByTitle);
         preparedStatement.setString(1, "%" + title + "%");
@@ -270,7 +278,7 @@ public class Jdatabase {
     }
 
     // 根据作者查询图书
-    public ResultSet selectBooksByAuthor(String author) throws Exception {
+    public static ResultSet selectBooksByAuthor(String author) throws Exception {
         String selectBooksByAuthor = "SELECT * FROM library_borrow_system.Book WHERE author = ?";
         preparedStatement = connection.prepareStatement(selectBooksByAuthor);
         preparedStatement.setString(1, author);
@@ -278,14 +286,14 @@ public class Jdatabase {
     }
 
     // 查询逾期的借阅记录
-    public ResultSet selectOverdueBorrows() throws Exception {
+    public static ResultSet selectOverdueBorrows() throws Exception {
         String selectOverdueBorrows = "SELECT * FROM library_borrow_system.Borrow WHERE duedate < CURDATE() AND returndate IS NULL";
         preparedStatement = connection.prepareStatement(selectOverdueBorrows);
         return preparedStatement.executeQuery();
     }
 
     // 用户登录验证
-    public ResultSet selectUserLogin(int userId, String password) throws Exception {
+    public static ResultSet selectUserLogin(int userId, String password) throws Exception {
         String selectUserLogin = "SELECT * FROM library_borrow_system.User WHERE id = ? AND pwd = ?";
         preparedStatement = connection.prepareStatement(selectUserLogin);
         preparedStatement.setInt(1, userId);
@@ -294,7 +302,7 @@ public class Jdatabase {
     }
 
     // 管理员登录验证
-    public ResultSet selectAdminLogin(int adminId, String password) throws Exception {
+    public static ResultSet selectAdminLogin(int adminId, String password) throws Exception {
         String selectAdminLogin = "SELECT * FROM library_borrow_system.Admin WHERE id = ? AND pwd = ?";
         preparedStatement = connection.prepareStatement(selectAdminLogin);
         preparedStatement.setInt(1, adminId);

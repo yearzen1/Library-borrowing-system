@@ -1,0 +1,62 @@
+@startuml 图书借阅系统ER图
+
+!define PRIMARY_KEY(x) <u>x</u>
+!define FOREIGN_KEY(x) <i>x</i>
+
+package "library_borrow_system 数据库" {
+
+  entity "用户表 (User)" as User {
+    PRIMARY_KEY(id) : INT
+    --
+    name : VARCHAR(50)
+    pwd : VARCHAR(100)
+  }
+
+  entity "管理员表 (Admin)" as Admin {
+    PRIMARY_KEY(id) : INT
+    --
+    name : VARCHAR(20)
+    pwd : VARCHAR(100)
+  }
+
+  entity "图书表 (Book)" as Book {
+    PRIMARY_KEY(id) : INT
+    --
+    isbn : VARCHAR(20)
+    title : VARCHAR(200)
+    author : VARCHAR(100)
+    isBorrow : BIT(1)
+  }
+
+  entity "借阅表 (Borrow)" as Borrow {
+    PRIMARY_KEY(borrowid) : INT
+    --
+    FOREIGN_KEY(userid) : INT
+    FOREIGN_KEY(bookid) : INT
+    borrowdate : DATE
+    duedate : DATE
+    returndate : DATE
+    status : VARCHAR(4)
+  }
+
+}
+
+User ||--o{ Borrow : "一个用户可以借阅多本书"
+
+note right of Borrow
+  约束条件:
+  status IN ('归还','未归还','逾期归还','逾期未归还')
+end note
+
+note right of Book
+  isBorrow字段:
+  0 = 未借出
+  1 = 已借出
+end note
+
+note top of "library_borrow_system 数据库"
+  数据库名: library_borrow_system
+  用途: 图书借阅管理系统
+end note
+
+@enduml
