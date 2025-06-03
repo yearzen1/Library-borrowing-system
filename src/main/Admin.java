@@ -19,7 +19,24 @@ public class Admin {
 
     // =================== 管理员基本操作 ===================
     
-
+    public void setId(int id) {
+        this.id = id;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public void setPwd(String pwd) {
+        this.pwd = pwd;
+    }
+    public int getId() {
+        return id;
+    }
+    public String getName() {
+        return name;
+    }
+    public String getPwd() {
+        return pwd;
+    }
     // 管理员登录
     Boolean login() throws Exception {
         ResultSet temp = Jdatabase.selectAdminLogin(id, pwd);

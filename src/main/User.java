@@ -16,6 +16,24 @@ public class User {
     int id;
     String name; 
     String pwd;
+    public void setId(int id) {
+        this.id = id;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public void setPwd(String pwd) {
+        this.pwd = pwd;
+    }
+    public int getId() {
+        return id;
+    }
+    public String getName() {
+        return name;
+    }
+    public String getPwd() {
+        return pwd;
+    }
     Boolean register() throws Exception
     {
         if(id > 99999999 || name.length() > 50 || pwd.length() > 100)
