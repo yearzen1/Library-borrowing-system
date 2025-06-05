@@ -1,4 +1,6 @@
-import javax.swing.*; 
+
+import javax.swing.*;
+
 import java.awt.*; 
 import java.util.HashMap; 
 import java.util.Map; 
@@ -211,29 +213,5 @@ public class LoginWindow extends JFrame {
             LoginWindow loginWindow = new LoginWindow();
             loginWindow.setVisible(true); 
         });
-    }
-}
-
-class User {
-    private final String username;
-    private final String password;
-    private final boolean isAdmin;
-
-    public User(String username, String password, boolean isAdmin) {
-        this.username  = username;
-        this.password  = password;
-        this.isAdmin  = isAdmin;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public boolean isAdmin() {
-        return isAdmin;
     }
 }
