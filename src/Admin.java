@@ -9,18 +9,12 @@ public class Admin {
     private String pwd;
 
     // 构造方法
-    public Admin(int id, String name, String pwd) {
-        this.id = id;
+    public Admin(String name, String pwd) {
         this.name = name;
         this.pwd = pwd;
     }
 
     // =================== 管理员基本操作 ===================
-    
-    // 设置管理员ID
-    public void setId(int id) {
-        this.id = id;
-    }
     // 设置管理员姓名
     public void setName(String name) {
         this.name = name;
@@ -44,31 +38,25 @@ public class Admin {
     // 管理员登录
     Boolean login() throws Exception {
         // 检查管理员账号和密码是否匹配
-        ResultSet temp = Jdatabase.selectAdminLogin(id, pwd);
-        if(temp.next())
+        ResultSet temp = Jdatabase.selectAdminByName(name);
+        if(temp.next() && pwd.equals(temp.getString(3)))
             return true;
         else
             return false;
     }
 
     // 修改管理员姓名
-    Boolean changeName(String name) throws Exception {
+    void changeName(String name) throws Exception {
         // 修改管理员姓名，长度不能超过20
-        if(name.length() > 20)
-            return false;
         Jdatabase.updateAdmin(id, name, pwd);
         this.name = name;
-        return true;
     }
 
     // 修改管理员密码
-    Boolean changePwd(String pwd) throws Exception {
+    void changePwd(String pwd) throws Exception {
         // 修改管理员密码，长度不能超过100
-        if(pwd.length() > 100)
-            return false;
         Jdatabase.updateAdmin(id, name, pwd);
         this.pwd = pwd;
-        return true;
     }
 
     // =================== 用户管理功能 ===================
@@ -150,29 +138,24 @@ public class Admin {
     }
 
     // 添加图书
-    Boolean addBook(int bookId, String isbn, String title, String author) throws Exception {
-        // 添加新图书，若ID已存在则返回false
-        if(title.length() > 200 || author.length() > 100)
-            return false;
-        ResultSet temp = Jdatabase.selectBookById(bookId);
+    Boolean addBook(String isbn, String title, String author) throws Exception {
+        // 添加新图书，若name已存在则返回false
+        ResultSet temp = Jdatabase.selectBooksByTitle(name);
         if(!temp.next()) {
-            Jdatabase.insertBook(bookId, isbn, title, author, false);
+            Jdatabase.insertBook(isbn, title, author, false);
             return true;
         } else {
-            return false; // 图书ID已存在
+            return false; // 图书name已存在
         }
     }
 
     // 修改图书信息
-    Boolean updateBookInfo(int bookId, String isbn, String title, String author) throws Exception {
+    Boolean updateBookInfo(int bookId, String isbn, String title, String author,boolean isborrow) throws Exception {
         // 修改指定图书的信息
-        if(title.length() > 200 || author.length() > 100)
-            return false;
         ResultSet temp = Jdatabase.selectBookById(bookId);
         if(!temp.next())
             return false;
-        boolean currentStatus = temp.getBoolean("isBorrow");
-        Jdatabase.updateBook(bookId, isbn, title, author, currentStatus);
+        Jdatabase.updateBook(bookId, isbn, title, author,isborrow);
         return true;
     }
 
