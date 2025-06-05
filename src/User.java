@@ -1,40 +1,47 @@
-
-
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.sql.Date;
 public class User {
 
+    // 构造方法
     User(int id,String name,String pwd)
     {
         this.id = id;
         this.name = name;
         this.pwd = pwd;
     }
-    int id;
-    String name; 
-    String pwd;
+    private int id;
+    private String name; 
+    private String pwd;
+    // 设置用户ID
     public void setId(int id) {
         this.id = id;
     }
+    // 设置用户姓名
     public void setName(String name) {
         this.name = name;
     }
+    // 设置用户密码
     public void setPwd(String pwd) {
         this.pwd = pwd;
     }
+    // 获取用户ID
     public int getId() {
         return id;
     }
+    // 获取用户姓名
     public String getName() {
         return name;
     }
+    // 获取用户密码
     public String getPwd() {
         return pwd;
     }
+    // 用户注册
     Boolean register() throws Exception
     {
+        // 检查用户信息是否符合要求，若ID不存在则注册新用户
         if(id > 99999999 || name.length() > 50 || pwd.length() > 100)
             return false;
         ResultSet temp = Jdatabase.selectUserById(id);
@@ -46,30 +53,38 @@ public class User {
         else
             return false;
     }
+    // 用户登录
     Boolean login() throws Exception
     {
+        // 检查用户ID和姓名是否匹配
         ResultSet temp = Jdatabase.selectUserLogin(id, name);
         if(temp.next())
             return true;
         else
             return false;
     }
+    // 修改用户姓名
     Boolean changeName(String name) throws Exception
     {   
+        // 修改用户姓名，长度不能超过50
         if(name.length() > 50)
             return false;
         Jdatabase.updateUser(id, name, pwd);
         return true;
     }
+    // 修改用户密码
     Boolean changePwd(String pwd) throws Exception
     {
+        // 修改用户密码，长度不能超过100
         if(pwd.length() > 100)
             return false;
         Jdatabase.updateUser(id, name, pwd);
         return true;
     }
+    // 查看所有图书
     ArrayList<String[]> viewAllBooks() throws Exception
     {
+        // 返回所有图书的信息列表
         ResultSet temp = Jdatabase.selectAllBooks();
         if(!temp.next())
             return null;
@@ -86,8 +101,10 @@ public class User {
         }
         return array;
     }
+    // 查看特定书名的图书
     ArrayList<String[]> viewSpecificBook(String name) throws Exception
     {
+        // 根据书名搜索图书
         ResultSet temp = Jdatabase.selectBooksByTitle(name);
         if(!temp.next())
             return null;
@@ -104,8 +121,10 @@ public class User {
         }
         return array;
     }
+    // 查看可借阅的图书
     ArrayList<String[]> viewAviliableBooks() throws Exception
     {
+        // 返回所有可借阅的图书列表
         ResultSet temp = Jdatabase.selectAvailableBooks();
         if(!temp.next())
             return null;
@@ -125,6 +144,7 @@ public class User {
     // 查看我的借阅记录
     ArrayList<String[]> viewMyBorrows() throws Exception
     {
+        // 自动更新逾期状态后返回当前用户的借阅记录
         autoUpdateOverdueBorrows();
         ResultSet temp = Jdatabase.selectBorrowsByUser(this.id);
         if(!temp.next())
@@ -143,12 +163,16 @@ public class User {
         }
         return array;
     }
+    // 生成借阅记录ID
     private int generateBorrowId() 
     {
+        // 简单的借阅ID生成策略
         return (int)(System.currentTimeMillis() % 100000000); // 简单的ID生成策略
     }
+    // 借阅图书
     Boolean borrowBooks(int id) throws Exception
     {
+        // 检查图书是否可借，若可借则创建借阅记录
         ResultSet temp =Jdatabase.selectBookById(id);
         if(!temp.next())
             return false;
@@ -165,6 +189,7 @@ public class User {
     }
     // 自动检查并更新逾期借阅记录
     private void autoUpdateOverdueBorrows() throws Exception {
+        // 检查当前用户的借阅记录，若已逾期则更新状态
         ResultSet temp = Jdatabase.selectBorrowsByUser(this.id);
         java.sql.Date currentDate = new java.sql.Date(System.currentTimeMillis());
         while(temp.next()) {
@@ -177,8 +202,10 @@ public class User {
             }
         }
     }
+    // 归还图书
     Boolean returnBooks(int id) throws Exception
     {
+        // 查找用户的借阅记录并处理归还，根据是否逾期更新不同状态
         ResultSet temp = Jdatabase.selectBorrowsByUser(this.id);
         int borrowid = -1;
         java.sql.Date dueDate = null;
