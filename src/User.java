@@ -43,6 +43,7 @@ public class User {
         {
             Jdatabase.insertUser(name, pwd);
             temp = Jdatabase.selectUserByName(name);
+            temp.next();
             id = temp.getInt(1);
             return true;
         }
