@@ -206,35 +206,45 @@ public class LoginWindow extends JFrame {
             JOptionPane.PLAIN_MESSAGE
         );
 
-        if (result == JOptionPane.OK_OPTION) 
-        {
-            String username = usernameField.getText().trim();
-            String pwd = new String(passwordField.getPassword()); 
-            String confirm = new String(confirmField.getPassword()); 
-            user.setName(username);
-            user.setPwd(pwd);
-            if (username.isEmpty() || pwd.isEmpty()) 
-            {
-                JOptionPane.showMessageDialog(this,  "用户名和密码不能为空", "注册失败", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            if (!pwd.equals(confirm)) 
-            {
-                JOptionPane.showMessageDialog(this,  "两次输入的密码不一致", "注册失败", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            boolean result1=user.register();
-            if (result1==false)  
-            {
+    if (result == JOptionPane.OK_OPTION) {
+        String username = usernameField.getText().trim(); 
+        String pwd = new String(passwordField.getPassword());  
+        String confirm = new String(confirmField.getPassword());  
+        
+        // 输入验证 
+        if (username.isEmpty()  || pwd.isEmpty())  {
+            JOptionPane.showMessageDialog(this,  "用户名和密码不能为空", "注册失败", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+ 
+        if (!pwd.equals(confirm))  {
+            JOptionPane.showMessageDialog(this,  "两次输入的密码不一致", "注册失败", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+ 
+        try {
+            user.setName(username); 
+            user.setPwd(pwd); 
+            boolean registrationResult = user.register(); 
+            
+            if (registrationResult) {
+                // 注册成功后操作 
+                JOptionPane.showMessageDialog(this,  "注册成功！", "注册成功", JOptionPane.INFORMATION_MESSAGE);
+                
+                // 可选：自动填充登录表单 
+                this.usernameField.setText(username); 
+                this.passwordField.setText(""); 
+                
+                return; // 明确返回 
+            } else {
                 JOptionPane.showMessageDialog(this,  "用户已存在", "注册失败", JOptionPane.ERROR_MESSAGE);
-                return;
             }
-            if(result1==true)
-            {
-            JOptionPane.showMessageDialog(this,  "注册成功！", "注册成功", JOptionPane.INFORMATION_MESSAGE);
-            }
-        }  
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,  "注册过程中发生错误: " + e.getMessage(),  "注册失败", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace(); 
+        }
+    }
+}
     }
     private void openMainWindow(User user) 
     {
