@@ -14,21 +14,21 @@ public class Jdatabase {
 
     private static String createdatabase = "create database if not exists library_borrow_system";
     private static String createUsertable = "create table if not exists library_borrow_system.User(" +
-                                                "id int primary key," +
+                                                "id int AUTO_INCREMENT primary key," +
                                                 "name varchar(50),"  +
                                                 "pwd varchar(100))" ;
     private static String createAdmintable = "create table if not exists library_borrow_system.Admin(" +
-                                            "id int primary key," +
+                                            "id int AUTO_INCREMENT primary key," +
                                             "name varchar(20)," +
                                             "pwd varchar(100))";
     private static String createBooktable = "create table if not exists library_borrow_system.Book(" +
-                                            "id int primary key," +
+                                            "id int AUTO_INCREMENT primary key," +
                                             "isbn varchar(20)," +
                                             "title varchar(200)," +
                                             "author varchar(100)," +
                                             "isBorrow bit(1))";
     private static String createBorrowtable = "create table if not exists library_borrow_system.Borrow(" +
-                                            "borrowid int primary key," +
+                                            "borrowid int AUTO_INCREMENT primary key," +
                                             "userid int," +
                                             "bookid int," +
                                             "borrowdate Date," +
@@ -40,49 +40,45 @@ public class Jdatabase {
     private static PreparedStatement preparedStatement = null;
     private static Connection connection = null;
 
-    private static String insertUser = "INSERT INTO library_borrow_system.User (id, name, pwd) VALUES (?, ?, ?)";
-    private static String insertAdmin = "INSERT INTO library_borrow_system.Admin (id, name, pwd) VALUES (?, ?, ?)";
-    private static String insertBook = "INSERT INTO library_borrow_system.Book (id, isbn, title, author, isBorrow) VALUES (?, ?, ?, ?, ?)";
-    private static String insertBorrow = "INSERT INTO library_borrow_system.Borrow (borrowid, userid, bookid, borrowdate, duedate, returndate, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    private static String insertUser = "INSERT INTO library_borrow_system.User (name, pwd) VALUES (?, ?)";
+    private static String insertAdmin = "INSERT INTO library_borrow_system.Admin (name, pwd) VALUES (?, ?)";
+    private static String insertBook = "INSERT INTO library_borrow_system.Book (isbn, title, author, isBorrow) VALUES (?, ?, ?, ?)";
+    private static String insertBorrow = "INSERT INTO library_borrow_system.Borrow (userid, bookid, borrowdate, duedate, returndate, status) VALUES (?, ?, ?, ?, ?, ?)";
 
-    public static void insertUser(int userId, String userName, String userPwd) throws Exception 
+    public static void insertUser(String userName, String userPwd) throws Exception 
     {
         preparedStatement = connection.prepareStatement(insertUser);
-        preparedStatement.setInt(1, userId);
-        preparedStatement.setString(2, userName);
-        preparedStatement.setString(3, userPwd);
+        preparedStatement.setString(1, userName);
+        preparedStatement.setString(2, userPwd);
         preparedStatement.executeUpdate();
     }
-    public static void insertAdmin(int adminId, String adminName, String adminPwd) throws Exception 
+    public static void insertAdmin(String adminName, String adminPwd) throws Exception 
     {
         preparedStatement = connection.prepareStatement(insertAdmin);
-        preparedStatement.setInt(1, adminId);
-        preparedStatement.setString(2, adminName);
-        preparedStatement.setString(3, adminPwd);
+        preparedStatement.setString(1, adminName);
+        preparedStatement.setString(2, adminPwd);
         preparedStatement.executeUpdate();
     }
-    public static void insertBook(int bookId, String isbn, String title, String author, boolean isBorrow) throws Exception 
+    public static void insertBook(String isbn, String title, String author, boolean isBorrow) throws Exception 
     {
         preparedStatement = connection.prepareStatement(insertBook);
-        preparedStatement.setInt(1, bookId);
-        preparedStatement.setString(2, isbn);
-        preparedStatement.setString(3, title);
-        preparedStatement.setString(4, author);
-        preparedStatement.setBoolean(5, isBorrow);
+        preparedStatement.setString(1, isbn);
+        preparedStatement.setString(2, title);
+        preparedStatement.setString(3, author);
+        preparedStatement.setBoolean(4, isBorrow);
         preparedStatement.executeUpdate();
     }
-    public static void insertBorrow(int borrowId, int userId, int bookId, 
+    public static void insertBorrow(int userId, int bookId, 
                             java.sql.Date borrowDate, java.sql.Date dueDate, 
                             java.sql.Date returnDate, String status) throws Exception 
     {
         preparedStatement = connection.prepareStatement(insertBorrow);
-        preparedStatement.setInt(1, borrowId);
-        preparedStatement.setInt(2, userId);
-        preparedStatement.setInt(3, bookId);
-        preparedStatement.setDate(4, borrowDate);
-        preparedStatement.setDate(5, dueDate);
-        preparedStatement.setDate(6, returnDate);
-        preparedStatement.setString(7, status);
+        preparedStatement.setInt(1, userId);
+        preparedStatement.setInt(2, bookId);
+        preparedStatement.setDate(3, borrowDate);
+        preparedStatement.setDate(4, dueDate);
+        preparedStatement.setDate(5, returnDate);
+        preparedStatement.setString(6, status);
         preparedStatement.executeUpdate();
     }
 
@@ -307,6 +303,22 @@ public class Jdatabase {
         preparedStatement = connection.prepareStatement(selectAdminLogin);
         preparedStatement.setInt(1, adminId);
         preparedStatement.setString(2, password);
+        return preparedStatement.executeQuery();
+    }
+
+    private static String selectUserByName = "SELECT * FROM library_borrow_system.User WHERE name = ?";
+    private static String selectAdminByName = "SELECT * FROM library_borrow_system.Admin WHERE name = ?";
+
+    public static ResultSet selectUserByName(String userName) throws Exception {
+        preparedStatement = connection.prepareStatement(selectUserByName);
+        preparedStatement.setString(1, userName);
+        return preparedStatement.executeQuery();
+    }
+    
+    // 根据姓名查询管理员
+    public static ResultSet selectAdminByName(String adminName) throws Exception {
+        preparedStatement = connection.prepareStatement(selectAdminByName);
+        preparedStatement.setString(1, adminName);
         return preparedStatement.executeQuery();
     }
 

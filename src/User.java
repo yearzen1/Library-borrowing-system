@@ -5,19 +5,15 @@ import java.sql.Date;
 public class User {
 
     // 构造方法
-    User(int id,String name,String pwd)
+    User(String name,String pwd)
     {
-        this.id = id;
         this.name = name;
         this.pwd = pwd;
     }
     private int id;
     private String name; 
     private String pwd;
-    // 设置用户ID
-    public void setId(int id) {
-        this.id = id;
-    }
+    
     // 设置用户姓名
     public void setName(String name) {
         this.name = name;
@@ -42,12 +38,11 @@ public class User {
     Boolean register() throws Exception
     {
         // 检查用户信息是否符合要求，若ID不存在则注册新用户
-        if(id > 99999999 || name.length() > 50 || pwd.length() > 100)
-            return false;
-        ResultSet temp = Jdatabase.selectUserById(id);
+        ResultSet temp = Jdatabase.selectUserByName(name);
         if(!temp.next())
         {
-            Jdatabase.insertUser(id, name, pwd);;
+            Jdatabase.insertUser(name, pwd);
+            id = temp.getInt(1);
             return true;
         }
         else
@@ -57,29 +52,28 @@ public class User {
     Boolean login() throws Exception
     {
         // 检查用户ID和姓名是否匹配
-        ResultSet temp = Jdatabase.selectUserLogin(id, name);
-        if(temp.next())
+        ResultSet temp = Jdatabase.selectUserByName(name);
+        if(temp.next() && temp.getString(3).equals(pwd))
+        {
+            id = temp.getInt(1);
             return true;
+        }
         else
             return false;
     }
     // 修改用户姓名
-    Boolean changeName(String name) throws Exception
+    void changeName(String name) throws Exception
     {   
         // 修改用户姓名，长度不能超过50
-        if(name.length() > 50)
-            return false;
         Jdatabase.updateUser(id, name, pwd);
-        return true;
+        this.name = name;
     }
     // 修改用户密码
-    Boolean changePwd(String pwd) throws Exception
+    void changePwd(String pwd) throws Exception
     {
         // 修改用户密码，长度不能超过100
-        if(pwd.length() > 100)
-            return false;
         Jdatabase.updateUser(id, name, pwd);
-        return true;
+        this.pwd = pwd;
     }
     // 查看所有图书
     ArrayList<String[]> viewAllBooks() throws Exception
@@ -163,12 +157,6 @@ public class User {
         }
         return array;
     }
-    // 生成借阅记录ID
-    private int generateBorrowId() 
-    {
-        // 简单的借阅ID生成策略
-        return (int)(System.currentTimeMillis() % 100000000); // 简单的ID生成策略
-    }
     // 借阅图书
     Boolean borrowBooks(int id) throws Exception
     {
@@ -180,10 +168,9 @@ public class User {
         if(isborrow == true)
             return false;
         Jdatabase.updateBookStatus(id, true);
-        int borrowId = generateBorrowId();
         Date borrowDate = new java.sql.Date(System.currentTimeMillis());
         Date dueDate = new java.sql.Date(System.currentTimeMillis() + 30L * 24 * 60 * 60 * 1000); // 30天后到期
-        Jdatabase.insertBorrow(borrowId, this.id, id, borrowDate, dueDate, null, "未归还");
+        Jdatabase.insertBorrow(this.id, id, borrowDate, dueDate, null, "未归还");
         return true;
 
     }
