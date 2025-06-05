@@ -15,7 +15,9 @@ public class LoginWindow extends JFrame {
     User user;
     Admin admin;
 
-    public LoginWindow()throws Exception {
+    public LoginWindow(User user,Admin admin)throws Exception {
+       this. user=user;
+       this.admin=admin;
         setupUI();
     }
 
