@@ -1,27 +1,28 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 /**
  * BookManagementSystem.java
  *
- * 图书借阅管理系统 — 登录后主界面
+ * 与 LoginWindow 配合使用的图书借阅管理系统 — 登录后主界面
  *
  * 说明：
- * 1. 使用 CardLayout 管理多个功能面板：修改密码、图书查询、借书管理、还书管理、用户管理、图书管理、借阅统计。
- * 2. 根据当前登录用户 currentUser.isAdmin() 决定哪些模块显示（普通读者 vs 管理员）。
- * 3. 各个模块中已预留“与数据库交互（DAO 层）”的位置（以 TODO 注释标识）。
- * 4. 界面布局使用常见的 BorderLayout、GridBagLayout、GridLayout、FlowLayout。
- * 5. 适当使用 JTable + DefaultTableModel 来展示“图书列表”、“借阅记录”、“用户列表”、“统计报表”等数据，方便后续二次开发。
+ *  1. 复用 LoginWindow 中的 User 类，以及静态方法 LoginWindow.getGlobalUserMap() 提供的用户数据源。
+ *  2. 使用 CardLayout 管理多个功能面板：修改密码、图书查询、借书管理、还书管理、用户管理、图书管理、借阅统计。
+ *  3. 根据当前登录用户 currentUser.isAdmin() 决定哪些模块显示（普通读者 vs 管理员）。
+ *  4. 各个模块中预留有“TODO”注释位置，方便将来替换为真正的数据库（DAO 层）实现。
+ *  5. 界面布局依然使用 BorderLayout、GridBagLayout、GridLayout、FlowLayout，表格使用 JTable + DefaultTableModel。
  */
 public class BookManagementSystem extends JFrame {
     private final CardLayout cardLayout = new CardLayout();
     private final JPanel mainPanel       = new JPanel(cardLayout);
 
     private final User currentUser;
-    // 从 LoginWindow 中获取全局的 “users” Map（演示用，后续可替换为真正的数据库）
+    // 直接从 LoginWindow 中获取全局的 “users” Map（示例用，后续可替换为真正的数据库）
     private final Map<String, User> users = LoginWindow.getGlobalUserMap();
 
     // 各卡片面板对应的名称
@@ -115,29 +116,29 @@ public class BookManagementSystem extends JFrame {
         setJMenuBar(menuBar);
     }
 
-    /** 3. 初始化所有卡片面板（对应 UML 顺序图中的各 participant 功能） **/
+    /** 3. 初始化所有卡片面板（对应 UML 顺序图中的各功能模块） **/
     private void initializeMainCards() {
-        // 3.1 修改密码 模块 (changepwd)
+        // 3.1 修改密码 模块
         mainPanel.add(createChangePwdPanel(), PANEL_CHANGE_PWD);
 
-        // 3.2 图书查询 模块 (BookMgmt)
+        // 3.2 图书查询 模块
         mainPanel.add(createBookQueryPanel(), PANEL_BOOK_QUERY);
 
-        // 3.3 借书管理 模块 (BorrowMgmt)
+        // 3.3 借书管理 模块
         mainPanel.add(createBorrowPanel(), PANEL_BORROW);
 
-        // 3.4 还书管理 模块 (ReturnMgmt)
+        // 3.4 还书管理 模块
         mainPanel.add(createReturnPanel(), PANEL_RETURN);
 
         // 仅管理员专属模块
         if (currentUser.isAdmin()) {
-            // 3.5 用户管理 模块 (UserMgmt)
+            // 3.5 用户管理 模块
             mainPanel.add(createUserMgmtPanel(), PANEL_USER_MGMT);
 
-            // 3.6 图书管理 模块 (后台增删改查)
+            // 3.6 图书管理 模块
             mainPanel.add(createBookMgmtPanel(), PANEL_BOOK_MGMT);
 
-            // 3.7 借阅统计 模块 (BorrowMgmt 报表)
+            // 3.7 借阅统计 模块
             mainPanel.add(createBorrowReportPanel(), PANEL_BORROW_REPORT);
         }
 
@@ -147,7 +148,7 @@ public class BookManagementSystem extends JFrame {
     }
 
     //——————————————————————————————————————————————————————————————————————————
-    // 3.1 “修改密码” Pane ：对应 UML 中 “2 修改密码” 模块
+    // 3.1 “修改密码” 面板：对应 UML 中 “修改密码” 流程
     //——————————————————————————————————————————————————————————————————————————
     private JPanel createChangePwdPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
@@ -216,8 +217,8 @@ public class BookManagementSystem extends JFrame {
                 txtConfirmPwd.setText("");
                 return;
             }
-            // —— TODO：如果使用数据库，请在此调用 UserDAO.updatePassword(userId, newPwdHash)
-            // 目前示例直接更新内存 Map 中的 User 对象
+            // —— TODO：如果正式对接数据库，请在此调用 UserDAO.updatePassword(username, newPwdHash)
+            // 当前示例仅模拟内存 Map 更新
             users.put(currentUser.getUsername(),
                     new User(currentUser.getUsername(), newPwd, currentUser.isAdmin()));
 
@@ -236,7 +237,7 @@ public class BookManagementSystem extends JFrame {
     }
 
     //——————————————————————————————————————————————————————————————————————————
-    // 3.2 “图书查询” Pane ：对应 UML 中 “2 图书查询” 模块
+    // 3.2 “图书查询” 面板：对应 UML 中 “图书查询” 流程
     //——————————————————————————————————————————————————————————————————————————
     private JPanel createBookQueryPanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -276,8 +277,8 @@ public class BookManagementSystem extends JFrame {
                         "请输入关键字进行查询", "提示", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            // TODO：BookDAO.searchBooksByKeyword(keyword)，获取 List<Book>，
-            //       清空 model，再 model.addRow(...) 填充新数据。
+            // TODO：调用 BookDAO.searchBooksByKeyword(keyword)，获取 List<Book>，
+            //       清空 model，再通过 model.addRow(...) 填充真正数据。
             JOptionPane.showMessageDialog(this,
                     "正在查询图书：\"" + keyword + "\" ...", "提示", JOptionPane.INFORMATION_MESSAGE);
         });
@@ -286,7 +287,7 @@ public class BookManagementSystem extends JFrame {
     }
 
     //——————————————————————————————————————————————————————————————————————————
-    // 3.3 “借书管理” Pane ：对应 UML 中 “3 借书管理” 模块
+    // 3.3 “借书管理” 面板：对应 UML 中 “借书管理” 流程
     //——————————————————————————————————————————————————————————————————————————
     private JPanel createBorrowPanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -340,7 +341,7 @@ public class BookManagementSystem extends JFrame {
             // TODO：对接数据库事务
             // Connection conn = DataSource.getConnection();
             // conn.setAutoCommit(false);
-            // BorrowDAO.insertBorrowRecord(currentUser.getId(), bookId, borrowDate, dueDate, conn);
+            // BorrowDAO.insertBorrowRecord(currentUser.getUsername(), bookId, borrowDate, dueDate, conn);
             // BookDAO.updateAvailableCount(bookId, available - 1, conn);
             // conn.commit();
 
@@ -357,7 +358,7 @@ public class BookManagementSystem extends JFrame {
     }
 
     //——————————————————————————————————————————————————————————————————————————
-    // 3.4 “还书管理” Pane ：对应 UML 中 “3 还书管理” 模块
+    // 3.4 “还书管理” 面板：对应 UML 中 “还书管理” 流程
     //——————————————————————————————————————————————————————————————————————————
     private JPanel createReturnPanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -373,7 +374,7 @@ public class BookManagementSystem extends JFrame {
         Object[][] sampleData = {
                 {"L001", "B005", "算法导论", "2025-05-20", "2025-06-20"},
                 {"L002", "B006", "操作系统", "2025-05-28", "2025-06-28"},
-                // TODO：实际项目中通过 BorrowDAO.getUnreturnedByUser(currentUserId) 加载
+                // TODO：实际项目中通过 BorrowDAO.getUnreturnedByUser(currentUser.getUsername()) 加载
         };
         DefaultTableModel model = new DefaultTableModel(sampleData, colNames) {
             @Override
@@ -421,7 +422,7 @@ public class BookManagementSystem extends JFrame {
     }
 
     //——————————————————————————————————————————————————————————————————————————
-    // 3.5 “用户管理” Pane ：仅管理员可见，对应 UML 中 “2 用户管理” 模块
+    // 3.5 “用户管理” 面板：仅管理员可见，对应 UML 中 “用户管理” 流程
     //——————————————————————————————————————————————————————————————————————————
     private JPanel createUserMgmtPanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -548,7 +549,7 @@ public class BookManagementSystem extends JFrame {
                 return;
             }
             String username = model.getValueAt(row, 0).toString();
-            // 禁止删除自己
+            // 禁止删除当前登录用户
             if (username.equals(currentUser.getUsername())) {
                 JOptionPane.showMessageDialog(this,
                         "无法删除当前登录的用户", "操作禁止", JOptionPane.ERROR_MESSAGE);
@@ -571,7 +572,7 @@ public class BookManagementSystem extends JFrame {
     }
 
     //——————————————————————————————————————————————————————————————————————————
-    // 3.6 “图书管理” Pane ：仅管理员可见，对应 UML 中 “Admin → BookMgmt” 模块
+    // 3.6 “图书管理” 面板：仅管理员可见，对应 UML 中 “图书管理” 流程
     //——————————————————————————————————————————————————————————————————————————
     private JPanel createBookMgmtPanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -640,7 +641,7 @@ public class BookManagementSystem extends JFrame {
                     return;
                 }
                 // TODO：调用 BookDAO.exists(id) 判断是否已有该图书
-                boolean exists = false; // 示例中直接设为 false
+                boolean exists = false; // 示例直接设为 false
                 if (exists) {
                     JOptionPane.showMessageDialog(this,
                             "图书ID已存在", "失败", JOptionPane.ERROR_MESSAGE);
@@ -698,7 +699,6 @@ public class BookManagementSystem extends JFrame {
                     return;
                 }
                 // TODO：BookDAO.updateBook(oldBookId, name, au, pub, total, newAvailable, newStatus);
-                // 这里暂时将“总库存”更新到第 5 列，但不更新“可借数量”和“状态”
                 model.setValueAt(name, row, 1);
                 model.setValueAt(au, row, 2);
                 model.setValueAt(pub, row, 3);
@@ -734,7 +734,7 @@ public class BookManagementSystem extends JFrame {
     }
 
     //——————————————————————————————————————————————————————————————————————————
-    // 3.7 “借阅统计” Pane ：仅管理员可见，对应 UML 中 “Admin → BorrowMgmt → FileSystem 读取借阅记录” 模块
+    // 3.7 “借阅统计” 面板：仅管理员可见，对应 UML 中 “借阅统计” 流程
     //——————————————————————————————————————————————————————————————————————————
     private JPanel createBorrowReportPanel() {
         JPanel panel = new JPanel(new BorderLayout());
