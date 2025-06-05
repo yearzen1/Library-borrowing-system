@@ -133,32 +133,57 @@ public class LoginWindow extends JFrame {
         return button;
     }
 
-    private void attemptLogin(boolean isAdmin) throws Exception {
-        String username = usernameField.getText().trim();
-        String password = new String(passwordField.getPassword());
+   private void attemptLogin(boolean isAdmin) throws Exception {
+    String username = usernameField.getText().trim();
+    String password = new String(passwordField.getPassword());
 
-        if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "用户名和密码不能为空", "登录失败", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
+    if (username.isEmpty() || password.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "用户名和密码不能为空", "登录失败", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
 
-        if (isAdmin) {
-            admin.setName(username);
-            admin.setPwd(password);
-            if (!admin.login()) {
-                JOptionPane.showMessageDialog(this, "用户名或密码错误", "登录失败", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            openMainWindow(admin);
+    boolean loginSuccess = false;
+
+    if (!isAdmin) {
+        // 普通用户登录
+        User user = new User(username, password);
+        loginSuccess = user.login();
+
+        if (loginSuccess) {
+            showUserMainFrame(user); // 打开用户主界面
         } else {
-            user.setName(username);
-            user.setPwd(password);
-            if (!user.login()) {
-                JOptionPane.showMessageDialog(this, "用户名或密码错误", "登录失败", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            openMainWindow(user);
+            JOptionPane.showMessageDialog(this, "用户名或密码错误", "登录失败", JOptionPane.ERROR_MESSAGE);
         }
+    } else {
+        // 管理员登录
+        Admin admin = new Admin(username, password);
+        loginSuccess = admin.login();
+
+        if (loginSuccess) {
+            showAdminMainFrame(admin); // 打开管理员主界面
+        } else {
+            JOptionPane.showMessageDialog(this, "用户名或密码错误", "登录失败", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}
+private void showUserMainFrame(User user) {
+        JFrame frame = new JFrame("用户图书管理系统");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800, 600);
+        frame.setLocationRelativeTo(null);
+        frame.setContentPane(new UserMainFrame(user));
+        frame.setVisible(true);
+        this.dispose();
+    }
+
+    private void showAdminMainFrame(Admin admin) {
+        JFrame frame = new JFrame("管理员图书管理系统");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(900, 650);
+        frame.setLocationRelativeTo(null);
+        frame.setContentPane(new AdminMainFrame(admin));
+        frame.setVisible(true);
+        this.dispose();
     }
 
     private void showRegisterDialog() throws Exception {

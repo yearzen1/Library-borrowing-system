@@ -191,6 +191,22 @@ public class Admin {
         }
         return array;
     }
+public void updateBookStatus(int bookId, boolean isBorrowed) throws Exception {
+    // 先查找图书，确认存在
+    ResultSet rs = Jdatabase.selectBookById(bookId);
+    if (!rs.next()) {
+        throw new Exception("图书不存在");
+    }
+    String isbn = rs.getString("isbn");
+    String title = rs.getString("title");
+    String author = rs.getString("author");
+
+    // 调用 updateBookInfo 更新状态，其它信息保持不变
+    boolean result = updateBookInfo(bookId, isbn, title, author, isBorrowed);
+    if (!result) {
+        throw new Exception("更新失败");
+    }
+}
 
     // 查看特定用户的借阅记录
     ArrayList<String[]> viewUserBorrows(int userId) throws Exception {

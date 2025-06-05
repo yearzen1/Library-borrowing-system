@@ -7,5 +7,7 @@ public class Main {
             Jdatabase.insertAdmin(admin.getName(), admin.getPwd());
             LoginWindow loginwindow=new LoginWindow(user,admin);
             loginwindow.setVisible(true);
+            
     }
+    
 }
