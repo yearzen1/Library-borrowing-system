@@ -12,18 +12,20 @@ public class LoginWindow extends JFrame {
     private JButton userLoginButton;
     private JButton adminLoginButton;
     private JButton registerButton;
+    User user;
+    Admin admin;
 
-    public LoginWindow() {
-        initializeUsers();
+    public LoginWindow()throws Exception {
         setupUI();
     }
 
-    private void setupUI() {
+    private void setupUI()throws Exception {
         setTitle("图书管理系统 登录界面");
         setSize(450, 350);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
+    
 
         JPanel mainPanel = new JPanel(new BorderLayout()) {
             @Override
@@ -81,13 +83,34 @@ public class LoginWindow extends JFrame {
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10,  30, 0, 30));
 
         userLoginButton = createStyledButton("用户登录", new Color(70, 130, 180));
-        userLoginButton.addActionListener(e  -> attemptLogin(false));
+        userLoginButton.addActionListener(e  -> {
+            try {
+                attemptLogin(false);
+            } catch (Exception e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        });
 
         adminLoginButton = createStyledButton("管理员登录", new Color(0, 100, 0));
-        adminLoginButton.addActionListener(e  -> attemptLogin(true));
+        adminLoginButton.addActionListener(e  -> {
+            try {
+                attemptLogin(true);
+            } catch (Exception e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        });
 
         registerButton = createStyledButton("用户注册", new Color(139, 0, 139));
-        registerButton.addActionListener(e  -> showRegisterDialog());
+        registerButton.addActionListener(e  -> {
+            try {
+                showRegisterDialog();
+            } catch (Exception e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        });
 
         buttonPanel.add(userLoginButton); 
         buttonPanel.add(adminLoginButton); 
@@ -96,7 +119,8 @@ public class LoginWindow extends JFrame {
         mainPanel.add(buttonPanel,  BorderLayout.SOUTH);
     }
 
-    private JButton createStyledButton(String text, Color bgColor) {
+    private JButton createStyledButton(String text, Color bgColor)
+    {
         JButton button = new JButton(text);
         button.setFont(new  Font("微软雅黑", Font.BOLD, 14));
         button.setBackground(bgColor); 
@@ -118,42 +142,50 @@ public class LoginWindow extends JFrame {
         });
         return button;
     }
+    private void attemptLogin(boolean isAdmin) throws Exception 
+    {
+        if(isAdmin==false)
+        {
+            String username = usernameField.getText().trim(); 
+            String password = new String(passwordField.getPassword()); 
+            user.setName(username);
+            user.setPwd(password);
 
-    private void initializeUsers() {
-        users.put("admin",  new User("admin", "admin123", true));
-        users.put("user1",  new User("user1", "password1", false));
-    }
-
-    private void attemptLogin(boolean isAdmin) {
-        String username = usernameField.getText().trim(); 
-        String password = new String(passwordField.getPassword()); 
-
-        if (username.isEmpty()  || password.isEmpty())  {
+        if (username.isEmpty()  || password.isEmpty())  
+        {
             JOptionPane.showMessageDialog(this,  "用户名和密码不能为空", "登录失败", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
-        User user = users.get(username); 
-        if (user == null) {
-            JOptionPane.showMessageDialog(this,  "用户名不存在", "登录失败", JOptionPane.ERROR_MESSAGE);
+        boolean result2=user.login();
+        if (result2==false)
+        {
+            JOptionPane.showMessageDialog(this,  "用户名或密码错误", "登录失败", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        }
+        else
+        {
+        String username = usernameField.getText().trim(); 
+        String password = new String(passwordField.getPassword()); 
+        admin.setName(username);
+        admin.setPwd(password);
 
-        if (!user.getPassword().equals(password))  {
-            JOptionPane.showMessageDialog(this,  "密码错误", "登录失败", JOptionPane.ERROR_MESSAGE);
-            passwordField.setText(""); 
+        if (username.isEmpty()  || password.isEmpty())  
+        {
+            JOptionPane.showMessageDialog(this,  "用户名和密码不能为空", "登录失败", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
-        if (isAdmin && !user.isAdmin())  {
-            JOptionPane.showMessageDialog(this,  "该用户不是管理员", "权限不足", JOptionPane.ERROR_MESSAGE);
+        boolean result2=admin.login();
+        if (result2==false) 
+        {
+            JOptionPane.showMessageDialog(this,  "用户名或密码错误", "登录失败", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
-        openMainWindow(user);
-    }
-
-    private void showRegisterDialog() {
+        }
+        // openMainWindow(user);打开窗口
+    }   
+    private void showRegisterDialog() throws Exception
+    {
         JTextField usernameField = new JTextField();
         JPasswordField passwordField = new JPasswordField();
         JPasswordField confirmField = new JPasswordField();
@@ -172,46 +204,43 @@ public class LoginWindow extends JFrame {
             JOptionPane.PLAIN_MESSAGE
         );
 
-        if (result == JOptionPane.OK_OPTION) {
-            String username = usernameField.getText().trim(); 
-            String password = new String(passwordField.getPassword()); 
+        if (result == JOptionPane.OK_OPTION) 
+        {
+            String username = usernameField.getText().trim();
+            String pwd = new String(passwordField.getPassword()); 
             String confirm = new String(confirmField.getPassword()); 
-
-            if (username.isEmpty()  || password.isEmpty())  {
+            user.setName(username);
+            user.setPwd(pwd);
+            if (username.isEmpty() || pwd.isEmpty()) 
+            {
                 JOptionPane.showMessageDialog(this,  "用户名和密码不能为空", "注册失败", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            if (!password.equals(confirm))  {
+            if (!pwd.equals(confirm)) 
+            {
                 JOptionPane.showMessageDialog(this,  "两次输入的密码不一致", "注册失败", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
-            if (users.containsKey(username))  {
-                JOptionPane.showMessageDialog(this,  "用户名已存在", "注册失败", JOptionPane.ERROR_MESSAGE);
+            boolean result1=user.register();
+            if (result1==false)  
+            {
+                JOptionPane.showMessageDialog(this,  "用户已存在", "注册失败", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
-            users.put(username,  new User(username, password, false));
+            if(result1==true)
+            {
             JOptionPane.showMessageDialog(this,  "注册成功！", "注册成功", JOptionPane.INFORMATION_MESSAGE);
-
-            this.usernameField.setText(username); 
-            this.passwordField.setText(password); 
-        }
+            }
+        }  
     }
-
-    private void openMainWindow(User user) {
-        SwingUtilities.invokeLater(()  -> {
+    private void openMainWindow(User user) 
+    {
+        SwingUtilities.invokeLater(()  -> 
+        {
             BookManagementSystem mainSystem = new BookManagementSystem(user);
             mainSystem.setVisible(true); 
             this.dispose(); 
-        });
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(()  -> {
-            LoginWindow loginWindow = new LoginWindow();
-            loginWindow.setVisible(true); 
         });
     }
 }
