@@ -1,9 +1,8 @@
-package main;
+
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
-
 import java.sql.Date;
 public class User {
 
