@@ -10,6 +10,9 @@ public class User {
         this.name = name;
         this.pwd = pwd;
     }
+    public User() {
+        //TODO Auto-generated constructor stub
+    }
     private int id;
     private String name; 
     private String pwd;

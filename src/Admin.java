@@ -14,6 +14,10 @@ public class Admin {
         this.pwd = pwd;
     }
 
+    public Admin() {
+        //TODO Auto-generated constructor stub
+    }
+
     // =================== 管理员基本操作 ===================
     // 设置管理员姓名
     public void setName(String name) {
@@ -258,6 +262,7 @@ public void updateBookStatus(int bookId, boolean isBorrowed) throws Exception {
             return false; // 未归还的记录不能删除
         }
     }
+    
 
     // =================== 统计分析功能 ===================
 

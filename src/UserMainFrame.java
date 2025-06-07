@@ -31,7 +31,6 @@ public class UserMainFrame extends JPanel {
         };
 
         JButton[] buttons = new JButton[buttonTexts.length];
-
         for (int i = 0; i < buttonTexts.length; i++) {
             buttons[i] = createStyledButton(buttonTexts[i]);
             buttonPanel.add(buttons[i]);
@@ -44,8 +43,19 @@ public class UserMainFrame extends JPanel {
         centerPanel.add(Box.createVerticalGlue());
         centerPanel.add(buttonPanel);
         centerPanel.add(Box.createVerticalGlue());
-
         add(centerPanel, BorderLayout.CENTER);
+
+        // 底部“退出登录”按钮
+        JButton logoutBtn = createStyledButton("退出登录");
+        logoutBtn.setFont(new Font("微软雅黑", Font.BOLD, 18));
+        logoutBtn.setBackground(new Color(200, 100, 100));
+        logoutBtn.setForeground(Color.WHITE);
+        logoutBtn.addActionListener(e -> logout());
+        // 为了让“退出登录”按钮居中，可以再包一层面板
+        JPanel southPanel = new JPanel();
+        southPanel.setOpaque(false);
+        southPanel.add(logoutBtn);
+        add(southPanel, BorderLayout.SOUTH);
 
         // 绑定事件
         buttons[0].addActionListener(e -> showBooks("all"));
@@ -69,6 +79,22 @@ public class UserMainFrame extends JPanel {
                 new EmptyBorder(10, 15, 10, 15)
         ));
         return button;
+    }
+
+    // 退出登录：关闭当前界面并重新打开登录窗口
+    private void logout() {
+        // 关闭当前所在的顶层窗口
+        Window window = SwingUtilities.getWindowAncestor(this);
+        if (window != null) {
+            window.dispose();
+        }
+        // 异步打开登录界面
+        SwingUtilities.invokeLater(() -> {
+            // 注意：下面假设 LoginWindow 构造需要 (User user, Admin admin) 两个参数，
+            //       并且 User/Adimn 都有无参构造。如果你的构造签名不同，请自行替换成对应写法。
+            LoginWindow loginWindow = new LoginWindow(new User(), new Admin());
+            loginWindow.setVisible(true);
+        });
     }
 
     // 以下逻辑保持不变
@@ -169,9 +195,28 @@ public class UserMainFrame extends JPanel {
             return;
         }
 
-        String[] columnNames = new String[data.get(0).length];
-        for (int i = 0; i < columnNames.length; i++) {
-            columnNames[i] = "列 " + (i + 1);
+        // 根据数据列数动态设置列名
+        String[] columnNames;
+        switch (data.get(0).length) {
+            case 5:
+                columnNames = new String[]{"图书ID", "ISBN", "书名", "作者", "借阅状态"};
+                break;
+            case 6:
+                columnNames = new String[]{"借阅ID", "图书ID", "书名", "借阅日期", "归还日期", "是否归还"};
+                break;
+            default:
+                // 如果列数未知，则用默认名称
+                columnNames = new String[data.get(0).length];
+               {
+                    columnNames[0] = "借阅id";
+                    columnNames[1] = "用户id";
+                    columnNames[2] = "图书id";
+                    columnNames[3] = "借阅时间";
+                    columnNames[4] = "最晚归还时间";
+                    columnNames[5] = "归还时间";
+                    columnNames[6] = "图书状态";
+                }
+                break;
         }
 
         JTable table = new JTable(data.toArray(new Object[0][]), columnNames);
@@ -179,7 +224,7 @@ public class UserMainFrame extends JPanel {
 
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), title, Dialog.ModalityType.APPLICATION_MODAL);
         dialog.getContentPane().add(scrollPane);
-        dialog.setSize(600, 400);
+        dialog.setSize(700, 400);
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
     }
