@@ -194,6 +194,28 @@ public class User {
             }
         }
     }
+
+     public Boolean renewBook(int bookId) throws Exception {
+        // 1. 找到当前用户该书未归还的借阅记录
+        ResultSet rs = Jdatabase.selectBorrowsByUser(this.id);
+        Date now = new Date(System.currentTimeMillis());
+        while (rs.next()) {
+            int bid = rs.getInt("bookid");
+            String status = rs.getString("status");
+            Date due = rs.getDate("duedate");
+            int borrowId = rs.getInt("borrowid");
+            // 只对“未归还”且未逾期的记录允许续借
+            if (bid == bookId && "未归还".equals(status) && due != null && !due.before(now)) {
+                // 2. 计算新的到期日期 +30天
+                Date newDue = new Date(due.getTime() + 30L * 24 * 60 * 60 * 1000);
+                // 3. 更新借阅记录的到期日期
+                Jdatabase.updateBorrowDueDate(borrowId, newDue);
+                return true;
+            }
+        }
+        return false;
+    }
+
     // 归还图书
     Boolean returnBooks(int id) throws Exception
     {

@@ -1,5 +1,6 @@
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -342,5 +343,13 @@ public class Jdatabase {
         preparedStatement = connection.prepareStatement(createBorrowtable);
         preparedStatement.executeUpdate();
         //初始化表
+    }
+    public static boolean insertFine(int userId, double amount) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'insertFine'");
+    }
+    public static void updateBorrowDueDate(int borrowId, Date newDue) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'updateBorrowDueDate'");
     }
 }

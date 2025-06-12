@@ -141,6 +141,53 @@ public class Admin {
         return array;
     }
 
+
+     public double calculateFine(int borrowId) throws Exception {
+        ResultSet rs = Jdatabase.selectBorrowById(borrowId);
+        if (!rs.next()) {
+            return 0;
+        }
+        String status = rs.getString("status");
+        // 只有“逾期未归还”状态才罚款
+        if (!"逾期未归还".equals(status)) {
+            return 0;
+        }
+        Date dueDate = rs.getDate("duedate");
+        long overdueMs = System.currentTimeMillis() - dueDate.getTime();
+        long days = overdueMs / (1000L * 60 * 60 * 24);
+        return days > 0 ? days * 1.0 : 0;
+    }
+
+    /**
+     * 对用户执行罚款：在数据库中新增一条罚款记录，并更新用户累计欠款
+     * @param userId 用户 ID
+     * @param amount 本次罚款金额
+     * @return true 若操作成功
+     */
+    public boolean imposeFine(int userId, double amount) throws Exception {
+        if (amount <= 0) {
+            return false;
+        }
+        // 假定 Jdatabase.insertFine 会：
+        // 1) 在 fines 表中插入一条 (userId, amount, now)
+        // 2) 同步更新 users 表中的 total_fine 字段
+        return Jdatabase.insertFine(userId, amount);
+    }
+
+    /**
+     * 获取用户当前的累计欠款
+     * @param userId 用户 ID
+     * @return 数据库中 users.total_fine 字段值，若不存在则返回 0
+     */
+    public double getUserTotalFine(int userId) throws Exception {
+        ResultSet rs = Jdatabase.selectUserById(userId);
+        if (rs.next()) {
+            // 假定 users 表里多了一个 total_fine 列
+            return rs.getDouble("total_fine");
+        }
+        return 0;
+    }
+
     // 添加图书
     Boolean addBook(String isbn, String title, String author) throws Exception {
         // 添加新图书，若name已存在则返回false

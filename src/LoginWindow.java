@@ -1,12 +1,16 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class LoginWindow extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JButton userLoginButton;
     private JButton adminLoginButton;
+    private JButton teacherLoginButton;
     private JButton registerButton;
+    private JButton teacherRegisterButton;
     User user;
     Admin admin;
 
@@ -18,7 +22,7 @@ public class LoginWindow extends JFrame {
 
     private void setupUI() {
         setTitle("图书管理系统 登录界面");
-        setSize(450, 350);
+        setSize(800, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
@@ -39,7 +43,7 @@ public class LoginWindow extends JFrame {
         add(mainPanel);
 
         JLabel titleLabel = new JLabel("图书管理系统", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("微软雅黑", Font.BOLD, 24));
+        titleLabel.setFont(new Font("微软雅黑", Font.BOLD, 28));
         titleLabel.setForeground(new Color(0, 0, 139));
         titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         mainPanel.add(titleLabel, BorderLayout.NORTH);
@@ -47,35 +51,41 @@ public class LoginWindow extends JFrame {
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setOpaque(false);
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.insets = new Insets(10, 10, 10, 10);
 
+        JLabel usernameLabel = new JLabel("用户名:");
+        usernameLabel.setFont(new Font("微软雅黑", Font.BOLD, 16));
+        usernameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.LINE_END;
-        formPanel.add(new JLabel("用户名:"), gbc);
+        formPanel.add(usernameLabel, gbc);
 
+        usernameField = new JTextField(20);
+        usernameField.setPreferredSize(new Dimension(250, 30));
+        usernameField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
         gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.LINE_START;
-        usernameField = new JTextField(15);
         formPanel.add(usernameField, gbc);
 
+        JLabel passwordLabel = new JLabel("密码:");
+        passwordLabel.setFont(new Font("微软雅黑", Font.BOLD, 16));
+        passwordLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.LINE_END;
-        formPanel.add(new JLabel("密码:"), gbc);
+        formPanel.add(passwordLabel, gbc);
 
+        passwordField = new JPasswordField(20);
+        passwordField.setPreferredSize(new Dimension(250, 30));
+        passwordField.setFont(new Font("微软雅黑", Font.PLAIN, 14));
         gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.LINE_START;
-        passwordField = new JPasswordField(15);
         formPanel.add(passwordField, gbc);
 
         mainPanel.add(formPanel, BorderLayout.CENTER);
 
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 3, 15, 0));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
         buttonPanel.setOpaque(false);
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 30, 0, 30));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
-        userLoginButton = createStyledButton("用户登录", new Color(70, 130, 180));
+        userLoginButton = createStyledButton("学生登录", new Color(70, 130, 180));
         userLoginButton.addActionListener(e -> {
             try {
                 attemptLogin(false);
@@ -93,8 +103,37 @@ public class LoginWindow extends JFrame {
             }
         });
 
-        registerButton = createStyledButton("用户注册", new Color(139, 0, 139));
+        teacherLoginButton = createStyledButton("老师登录", new Color(255, 165, 0));
+        teacherLoginButton.addActionListener(e -> {
+            try {
+                String username = usernameField.getText().trim();
+                String password = new String(passwordField.getPassword());
+                if (username.isEmpty() || password.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "用户名和密码不能为空", "登录失败", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                User teacherUser = new User(username, password);
+                if (teacherUser.login()) {
+                    showUserMainFrame(teacherUser);
+                } else {
+                    JOptionPane.showMessageDialog(this, "用户名或密码错误", "登录失败", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        registerButton = createStyledButton("学生注册", new Color(139, 0, 139));
         registerButton.addActionListener(e -> {
+            try {
+                showRegisterDialog();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        teacherRegisterButton = createStyledButton("老师注册", new Color(139, 0, 139));
+        teacherRegisterButton.addActionListener(e -> {
             try {
                 showRegisterDialog();
             } catch (Exception ex) {
@@ -104,7 +143,9 @@ public class LoginWindow extends JFrame {
 
         buttonPanel.add(userLoginButton);
         buttonPanel.add(adminLoginButton);
+        buttonPanel.add(teacherLoginButton);
         buttonPanel.add(registerButton);
+        buttonPanel.add(teacherRegisterButton);
 
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
     }
@@ -120,53 +161,53 @@ public class LoginWindow extends JFrame {
                 BorderFactory.createEmptyBorder(5, 15, 5, 15)
         ));
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        button.setPreferredSize(new Dimension(140, 40));
 
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
+        button.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent evt) {
                 button.setBackground(bgColor.darker());
             }
 
-            public void mouseExited(java.awt.event.MouseEvent evt) {
+            public void mouseExited(MouseEvent evt) {
                 button.setBackground(bgColor);
             }
         });
         return button;
     }
 
-   private void attemptLogin(boolean isAdmin) throws Exception {
-    String username = usernameField.getText().trim();
-    String password = new String(passwordField.getPassword());
+    private void attemptLogin(boolean isAdmin) throws Exception {
+        String username = usernameField.getText().trim();
+        String password = new String(passwordField.getPassword());
 
-    if (username.isEmpty() || password.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "用户名和密码不能为空", "登录失败", JOptionPane.WARNING_MESSAGE);
-        return;
+        if (username.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "用户名和密码不能为空", "登录失败", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        boolean loginSuccess = false;
+
+        if (!isAdmin) {
+            User user = new User(username, password);
+            loginSuccess = user.login();
+
+            if (loginSuccess) {
+                showUserMainFrame(user);
+            } else {
+                JOptionPane.showMessageDialog(this, "用户名或密码错误", "登录失败", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            Admin admin = new Admin(username, password);
+            loginSuccess = admin.login();
+
+            if (loginSuccess) {
+                showAdminMainFrame(admin);
+            } else {
+                JOptionPane.showMessageDialog(this, "用户名或密码错误", "登录失败", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
-    boolean loginSuccess = false;
-
-    if (!isAdmin) {
-        // 普通用户登录
-        User user = new User(username, password);
-        loginSuccess = user.login();
-
-        if (loginSuccess) {
-            showUserMainFrame(user); // 打开用户主界面
-        } else {
-            JOptionPane.showMessageDialog(this, "用户名或密码错误", "登录失败", JOptionPane.ERROR_MESSAGE);
-        }
-    } else {
-        // 管理员登录
-        Admin admin = new Admin(username, password);
-        loginSuccess = admin.login();
-
-        if (loginSuccess) {
-            showAdminMainFrame(admin); // 打开管理员主界面
-        } else {
-            JOptionPane.showMessageDialog(this, "用户名或密码错误", "登录失败", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-}
-private void showUserMainFrame(User user) {
+    private void showUserMainFrame(User user) {
         JFrame frame = new JFrame("用户图书管理系统");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
